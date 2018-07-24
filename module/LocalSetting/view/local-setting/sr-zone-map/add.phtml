@@ -1,0 +1,211 @@
+<?php
+	$title = 'Add SR and Zone Map';
+	$this->headTitle($title);
+	?>
+     <script type="text/javascript">
+	 $(document).ready(function(){
+		$("#EMPLOYEE_ID").change(function(){
+				$('#showTemplateDefaultCharge').fadeIn('slow');									
+				$('#preloader').fadeIn('slow');
+				if ($(this).val() == '') {
+					$('#EMPLOYEE_ID').val('');
+					return false;
+				}
+				var employeeID 	= $("#EMPLOYEE_ID").val();
+				//alert('hi there');
+				// End default template charge
+				var url = '/srzonemap/getZoneList?id=' + $(this).val();
+				//$.post(url, function(data) {
+				$.getJSON(url, function(data) {
+				    //alert(data);
+					//alert(data.length);
+					//alert(JSON.stringify(data));			
+					var chargeTable = '';
+					var k = 1;
+					if(data.length>0) {
+						//alert(data);
+						chargeTable += '<table border="0" width="100%" class="table" cellpadding="2" cellspacing="2" style="font-size:100%;">';
+						chargeTable +='<tr>';
+						chargeTable +='<td width="5%">' + '<input type="checkbox" name="chargeAllCheck" onclick="check(\'investor_charge\')" id="investor_charge_all" value="" disabled="disabled"  />' + '</td>';
+						chargeTable +='<td width="30%"><b>ZONE</b></td>';
+						chargeTable +='<td width="10%"><b>SHORT NAME</b></td>';
+						chargeTable +='<td width="20%" style="text-align:left;"><b>Branch</b></td>';
+						chargeTable +='<td width="35%" style="text-align:left;"><b>Address</b></td>';
+						chargeTable +='</tr>';
+						for (var i = 0; i < data.length; i++) {
+							var tcid = data[i].ZONE_ID;					
+							chargeTable +='<tr>';
+	chargeTable += '<td>' + '<input type="checkbox" name="ZONE_ID[]" onclick="check_me(\'investor_charge\');" id="investor_charge'+k+'" value="'+ data[i].ZONE_ID +'" />' + '</td>';
+							chargeTable += '<td>' + data[i].NAME + '</td>';
+							chargeTable += '<td>' + data[i].SHORT_NAME + '</td>';
+							chargeTable += '<td>' + data[i].BRANCHNAME + '</td>';
+							chargeTable += '<td>' + data[i].ADDRESS + '</td>';
+							chargeTable += '</tr>';
+							k++;
+						}							
+						chargeTable += '</table>';
+						//$('#showTemplateDefaultCharge').fadeIn('slow');
+						$("#showTemplateDefaultCharge").html('');
+						$("#showTemplateDefaultCharge").html(chargeTable);						
+						//$('#showTemplateDefaultCharge').html(data);
+						//$('#showTemplateDefaultCharge').fadeIn("slow");
+						$('#preloader').fadeOut('slow');
+						document.getElementById('num_of_investor_charge').value = k;
+						//$('#showTotalAmount').fadeIn('slow');
+					} else {
+						chargeTable += '<table width="100%">';
+						chargeTable +='<tr>';
+						chargeTable +='<td>No Charge Found!</td>';
+						chargeTable += '</tr>';
+						chargeTable += '</table>';
+						$("#showTemplateDefaultCharge").html('');				
+						$("#showTemplateDefaultCharge").html(chargeTable);
+						//$('#showTotalAmount').fadeOut('slow');
+					}
+					return true;
+				});
+			});
+	 });
+	 
+	 $(document).ready(function(){
+			$("#DESIGNATION_ID").focus();
+		});
+	 function doValidationSrZoneMapForm() {
+		if(document.getElementById('DESIGNATION_ID').value=="") {
+			//alert("Please select Designation!");
+			document.getElementById('DESIGNATION_ID').focus();
+			return false;
+		}
+		if(document.getElementById('EMPLOYEE_ID').value=="") {
+			//alert("Please select SR name!");
+			document.getElementById('EMPLOYEE_ID').focus();
+			return false;
+		}
+		/*if(document.getElementById('ZONE_ID').value=="") {
+			alert("Please select Zone name!");
+			document.getElementById('ZONE_ID').focus();
+			return false;
+		}*/
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+	
+	function getEmployeeName(designationId) {
+		//alert(designationId);
+		//$.post('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+		$.getJSON('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+				//alert(j);
+				if(j.length>0)
+				{
+					var options = '';
+					options += '<option value="">Select Emp. Name</option>';
+					for (var i = 0; i < j.length; i++) {
+					options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+				else
+				{
+					options = '<option value="">Select Emp. Name</option>';
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+			});
+	}
+	 
+	 
+	</script>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('srzonemap',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	//echo $this->formHidden($form->get('ZONE_ID'));
+?>
+<table width="95%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Designation</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('DESIGNATION_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">SR Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMPLOYEE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <!--<tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Zone Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php //echo $this->formRow($form->get('ZONE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>-->
+      	<tr valign="top">
+            <td align="left" colspan="4">
+                <div id="showTemplateDefaultCharge" style="width:100%;display:none;">
+                	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr>
+                                <td id="preloader" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg1' style="font-weight:normal;margin-top:0px;">Please, wait while retailer list is loading . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right"></td>
+            <td align="left"></td>
+            <td align="left"></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+               
+			   
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script>
+$('form#srZoneMap input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationSupplierInformationForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

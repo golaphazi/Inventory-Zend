@@ -1,0 +1,172 @@
+<?php
+	$title = 'Add SR and Retailer Map';
+	$this->headTitle($title);
+	?>
+     <script type="text/javascript">
+	 $(document).ready(function(){
+		$("#EMPLOYEE_ID").change(function(){
+				$('#showTemplateDefaultCharge').fadeIn('slow');									
+				$('#preloader').fadeIn('slow');
+				if ($(this).val() == '') {
+					$('#EMPLOYEE_ID').val('');
+					return false;
+				}
+				var employeeID 	= $("#EMPLOYEE_ID").val();
+				$("#showTemplateDefaultCharge").html('');	
+				var url = '/srretailermap/getRetailerList?id=' + $(this).val();
+				$.get(url, function(data) {
+				
+					$("#showTemplateDefaultCharge").html(data);		
+						
+				return true;
+			});
+		});
+	 });
+	 
+	 $(document).ready(function(){
+			$("#DESIGNATION_ID").focus();
+		});
+	 function doValidationSrRetailerMapForm() {
+		 if(document.getElementById('DESIGNATION_ID').value=="") {
+			//alert("Please select Designation!");
+			document.getElementById('DESIGNATION_ID').focus();
+			return false;
+		}
+		if(document.getElementById('EMPLOYEE_ID').value=="") {
+			//alert("Please select SR name!");
+			document.getElementById('EMPLOYEE_ID').focus();
+			return false;
+		}
+		/*if(document.getElementById('RETAILER_ID').value=="") {
+			alert("Please select Retailer name!");
+			document.getElementById('RETAILER_ID').focus();
+			return false;
+		}*/
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+	function getEmployeeName(designationId) {
+		//alert(designationId);
+		//$.post('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+		$.getJSON('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+				//alert(j);
+				if(j.length>0)
+				{
+					var options = '';
+					options += '<option value="">Select Emp. Name</option>';
+					for (var i = 0; i < j.length; i++) {
+					options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+				else
+				{
+					options = '<option value="">Select Emp. Name</option>';
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+			});
+	} 
+	 
+	 function check_me_add(id,reId,srID){
+			//alert(id);
+			var url = '/srretailermap/getRetailerListDataAdd?id=' + id + '&reId=' + reId + '&srID=' + srID;
+			$.getJSON(url, function(data) {
+				alert(data);
+			});
+			
+		}
+	</script>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('srretailermap',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	echo $this->formHidden($form->get('SR_RETAILER_MAP_ID'));
+?>
+<table width="95%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Designation</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('DESIGNATION_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">SR Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMPLOYEE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+         <!--<tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Retailer Shop</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php //echo $this->formRow($form->get('RETAILER_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>-->
+      	<tr valign="top">
+            <td align="left" colspan="4">
+                <div id="showTemplateDefaultCharge" style="width:100%;display:none;">
+                	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr>
+                                <td id="preloader" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg1' style="font-weight:normal;margin-top:0px;">Please, wait while retailer list is loading . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right"></td>
+            <td align="left"></td>
+            <td align="left"></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+
+<script>
+$('form#srRetailerMap input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationSrRetailerMapForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

@@ -1,0 +1,154 @@
+<?php
+	$title = 'Add Supplier Info';
+	$this->headTitle($title);
+	?>
+     <script type="text/javascript">
+		$(document).ready(function(){
+			$("#NAME").focus();
+		});	
+	 function doValidationSupplierInformationForm() {
+		if($("#NAME").val() == '') {
+			//alert("Please input Supplier Name!");
+			$("#NAME").focus().css({"border":"1px solid red"});
+			return false;
+		}
+		if($("#SHORT_NAME").val() == '') {
+			//alert("Please input Supplier Short Name!");
+			$("#NAME").css({"border":"1px solid green"});
+			$("#SHORT_NAME").focus().css({"border":"1px solid red"});
+			return false;
+		}
+		if($("#ADDRESS").val() == '') {
+			//alert("Please input Supplier Address!");
+			$("#SHORT_NAME, #NAME").css({"border":"1px solid green"});
+			$("#ADDRESS").focus().css({"border":"1px solid red"});
+			return false;
+		}
+		if($("#MOBILE").val() == '') {
+			//alert("Please input Supplier Mobile!");
+			$("#ADDRESS, #SHORT_NAME, #NAME").css({"border":"1px solid green"});
+			$("#MOBILE").focus().css({"border":"1px solid red"});
+			return false;
+		}
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+	</script>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('supplierinformation',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	echo $this->formHidden($form->get('SUPPLIER_INFO_ID'));
+?>
+<table width="70%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('NAME')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Short Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('SHORT_NAME')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ADDRESS')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Phone</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('PHONE')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Fax</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('FAX')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Mobile</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('MOBILE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Web</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('WEB')); ?>
+            	
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Email</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMAIL')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right"></td>
+            <td align="left"></td>
+            <td align="left"></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+               
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+
+<script>
+$('form#supplierInformation input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationSupplierInformationForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

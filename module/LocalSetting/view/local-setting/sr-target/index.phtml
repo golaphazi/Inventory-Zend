@@ -1,0 +1,53 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+	<a href="<?php echo $this->url('srtarget', array('action'=>'add'));?>">Add SR Target</a> &nbsp;
+</p>
+<?php
+	$coaTitle = 'SR Target';
+	$this->headTitle($coaTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>SL#</th>
+        <th>SR NAME</th>
+        <th>REMARKS</th>
+        <th>START DATE</th>
+        <th>END DATE</th>
+        <th>BUSINESS DATE</th>
+        <th>&nbsp;</th>
+    </tr>
+    <?php 
+	$class = '';
+	$i = 1; 
+	foreach ($srTargets as $srTarget) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $i;?></td>
+        <td><?php echo $this->escapeHtml($srTarget->EMPLOYEE_NAME);?></td>
+        <td><?php echo $this->escapeHtml($srTarget->REMARKS);?></td>
+        <td><?php echo $this->escapeHtml($srTarget->START_DATE);?></td>
+        <td><?php echo $this->escapeHtml($srTarget->END_DATE);?></td>
+        <td><?php echo $this->escapeHtml($srTarget->BUSINESS_DATE);?></td>
+        <td>
+            <a href="<?php  echo $this->url('srtarget',array('action'=>'delete', 'id' => $srTarget->SR_TARGET_ID));?>">Delete</a>
+            
+        </td>
+    </tr>
+    <?php $i++; endforeach; ?>
+</table>
+<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	//echo $this->paginationControl($srTargets,'sliding',array('partial/paginator.phtml', 'ZoneInformation'),array('route' => 'srtarget'));
+?>
+</span>

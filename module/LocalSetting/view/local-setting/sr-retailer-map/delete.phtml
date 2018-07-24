@@ -1,0 +1,21 @@
+<?php
+	$title = 'Delete SR and Zone Map';
+	$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>Are you sure that you want to delete
+	'<?php echo $this->escapeHtml($zoneInformation->NAME)?>'?
+</p>
+<?php
+	$url = $this->url('srretailermap', array(
+		'action'	=> 'delete',
+		'id'		=> $zoneInformation->SR_ZONE_MAP_ID,
+	));
+?>
+<form action="<?php echo $url; ?>" method="post">
+    <div>
+    	<input type="hidden" name="id" value="<?php echo (int) $zoneInformation->SR_ZONE_MAP_ID;?>" />
+        <input type="submit" name="del" value="Yes" />
+        <input type="submit" name="del" value="No" />
+    </div>
+</form>

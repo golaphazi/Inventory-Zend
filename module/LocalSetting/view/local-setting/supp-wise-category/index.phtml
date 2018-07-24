@@ -1,0 +1,182 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+<a href="<?php echo $this->url('suppwisecategory', array('action'=>'add'));?>">Add Supplier Wise Product</a>
+</p>
+<?php
+	$coaTitle = 'Supplier Wise Product';
+	$this->headTitle($coaTitle);
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('suppwisecategory'));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th align="right" colspan="8"><a  href="javascript:void(0);" onclick="ShowHide('view_search_engine')">Advance Search<i class="icon-chevron-<?php echo $url_order == 'ASC' ? 'down' : 'up' ?>"></i></a></th>
+    </tr>
+    <tr id="view_search_engine" style="display:none;background:#FFFFFF;">
+		<td colspan="8">
+            <table border="0" cellpadding="3" cellspacing="0" width="100%">
+                <tr>
+                    <td width="15%">Supplier</td>
+                    <td width="40%"><?php echo $this->formRow($form->get('SUPPLIER_INFO_ID')); ?></td>
+                    <td width="15%">&nbsp;</td>
+                    <td width="40%"><?php //echo $this->formRow($form->get('INSTRUMENT_GROUP')); ?></td>
+                </tr>
+                <tr>
+                    <td width="15%">Product</td>
+                    <td width="40%"><div style="position:relative; display:block;" id="showCustVoucherNo">
+                                        <input name="CATEGORY_ID" id="CATEGORY_ID" type="hidden" value="" />
+                                        <input class="FormSelectTypeInput" name="CATEGORY_NAME" id="CATEGORY_NAME" type="text"  autocomplete="off" value="Input Product Name Here" onkeyup="customVoucherNo_suggest(this.value);" maxlength="100" onblur="if(this.value=='') { this.value='Input Product Name Here';this.style.color='#888';$(this).css('font-style','oblique');} " onfocus="if(this.value=='Input Product Name Here') {this.value=''; this.style.color='#000';$(this).css('font-style','normal')}" style="width:200px;this.style.color='#888';$(this).css('font-style','oblique'); text-transform:uppercase;" />
+                                        <div id='VoucherNoSuggestions' style='display:none; width:205px; height:205px;' class='ClassempIdSuggestions'>
+                                            <div id='VoucherNoSuggestionsList' class=''>
+                                            </div>
+                                        </div>
+                                    </div>
+                    </td>
+                    <td colspan="2"> Supply Status:&nbsp;
+                    	<input class="FormRadioTypeInput" type="radio" name="IS_SUPPLY" id="is_supply_y" value="yes" checked="checked"/>&nbsp;Yes 
+                        <input class="FormRadioTypeInput" type="radio" name="IS_SUPPLY" id="is_supply_n" value="no" />&nbsp;No&nbsp;
+                        <input class="FormRadioTypeInput" type="radio" name="IS_SUPPLY" id="is_supply_a" value="all" />&nbsp;Show full history&nbsp;
+                    </td>
+                 </tr>
+                 <tr>                                     
+                     <td colspan="4" align="center"><input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='button' name='goBtn' id='goBtn' value='GO'/>
+                        <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='reset' name='Reset' id='Reset' value='Reset' onclick="setReset();"/>
+                        </td>
+                 </tr>
+            </table>
+        </td>
+    </tr>
+ </table>
+ <div id="showMarginableScripHere" style="border:1px dotted #888;font-family:Tahoma, Geneva, sans-serif;">
+ <table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>Product Name</th>
+        <th>Supplier</th>
+        <th>Supply Status</th>
+        <th>Supply Since</th>
+        <th>Supply End/Stop Date</th>
+        <th>Action</th>
+    </tr>
+    <?php 
+	$class = '';
+	foreach ($categories as $categoryData) : 
+	//echo "<pre>"; print_r($categories); die();	
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+		$style = '';//($categoryData->NODE_DEPTH == 2) ? 'style="font-weight:bold;"' : '';
+		$endDateStatus = $categoryData->END_DATE;
+		if($endDateStatus == '0000-00-00'){
+			$endDateStatus = 'Continue';
+		} else {
+			$endDateStatus = $endDateStatus;
+		}
+	?>
+    
+    <tr class="<?php echo $class; ?>" <?php echo $style; ?> >
+        <td><?php echo $categoryData->CATEGORY_NAME;?></td>
+        <td><?php echo $categoryData->NAME;?></td>
+        <td><?php echo ucwords($categoryData->IS_SUPPLY);?></td>
+        <td><?php echo date('d/m/Y',strtotime($categoryData->START_DATE));?></td>
+        <td><?php echo $endDateStatus;?></td>
+        <td style="display:no ne">
+        	<a href="<?php echo $this->url('suppwisecategory',array('action'=>'edit', 'id' => $categoryData->SUPP_WISE_CATEGORY_ID));?>">Edit</a>
+            <!--<a href="<?php //echo $this->url('suppwisecategory',array('action'=>'delete', 'id' => $categoryData->SUPP_WISE_CATEGORY_ID));?>">Delete</a>-->
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	echo $this->paginationControl($categories,'sliding',array('partial/paginator.phtml', 'SuppWiseCategory'),array('route' => 'suppwisecategory'));
+?>
+</span>
+</div>
+<script type="application/javascript">
+	$(document).ready(function() {
+		$("#goBtn").click(function() {
+				var CATEGORY_ID = $("#CATEGORY_ID").val();
+				var SUPPLIER_INFO_ID = $("#SUPPLIER_INFO_ID").val();
+				var status 	= $('input:radio[name=IS_SUPPLY]:checked').val();
+				var productName  = $("#CATEGORY_NAME").val();
+//$.post('/suppwisecategory/getAdvanceSearch',{'CATEGORY_ID':CATEGORY_ID,'SUPPLIER_INFO_ID':SUPPLIER_INFO_ID,'status':status}, function(data) {	
+$.getJSON('/suppwisecategory/getAdvanceSearch',{'CATEGORY_ID':CATEGORY_ID,'SUPPLIER_INFO_ID':SUPPLIER_INFO_ID,'status':status,'productName': productName}, function(data) {
+				//alert('asdf');
+				if(data.length > 0) 
+				{
+				 	//alert(data);
+					$('#preloader1').fadeIn('slow');
+					$('#noDataFound').fadeOut('slow');
+					$('#preloader1').fadeOut('slow');
+					$('#showMarginableScripHere').html(data);
+					$('#showMarginableScripHere').fadeIn("slow");
+				}
+				else 
+				{
+					//alert('asdfsadf');
+					$('#showMarginableScripHere').html('');
+					$('#preloader1').fadeIn('slow');
+					$('#noDataFound').fadeIn('slow');
+					
+				}	
+			});
+		});
+	});
+	function getDeleteSystemCategory(systemNavId) {
+		if(!confirm('Are you sure, you want to delete?')) {
+			return false;
+		} else {
+			var url = '/category/deleteSystemCategory?systemNavId=' + systemNavId;
+			//$.getJSON(url, function(data) {
+			$.post(url, function(data) {
+				alert(data);
+				if(data==true) {
+					window.location.href = "http://csfwm.localhost/category";
+				} else {
+					window.location.href = "http://csfwm.localhost/category";
+				}
+			});	
+		}
+	}
+	function customVoucherNo_suggest(inputString) {
+		if(inputString.length == 0)
+		{
+			$('#VoucherNoSuggestions').fadeOut();
+		} 
+		else 
+		{
+			//$.post('/suppwisecategory/getSuggestRefCATName',{'queryString':inputString}, function(j) {	
+			$.getJSON('/suppwisecategory/getSuggestRefCATName',{'queryString':inputString}, function(j) {
+			if(j.length > 0) 
+				{									
+					//alert(j);
+					$('#VoucherNoSuggestionsList').html(j);
+					$('#VoucherNoSuggestions').fadeIn("slow");
+					
+				} else{
+					$('#VoucherNoSuggestions').fadeOut();
+				}
+			});
+		}
+	}
+	function fill_id(thisValue,instrumentID){
+	   if(thisValue == ''){
+		    document.getElementById('CATEGORY_ID').value = '';
+			document.getElementById('CATEGORY_NAME').value = '';
+			return false;
+		}
+		document.getElementById('CATEGORY_ID').value = thisValue;
+		document.getElementById('CATEGORY_NAME').value = instrumentID;
+		$('#VoucherNoSuggestions').fadeOut();
+	}
+</script>

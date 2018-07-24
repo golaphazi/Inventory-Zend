@@ -1,0 +1,61 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+	<a href="<?php echo $this->url('supplierinformation', array('action'=>'add'));?>">Add Supplier</a> &nbsp;
+</p>
+<?php
+	$coaTitle = 'Supplier Information';
+	$this->headTitle($coaTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>SL#</th>
+        <th>NAME</th>
+        <th>SHORT NAME</th>
+        <th>ADDRESS</th>
+        <th>PHONE</th>
+        <th>FAX</th>
+        <th>MOBILE</th>
+        <th>WEB</th>
+        <th>EMAIL</th>
+        <th>BUSINESS DATE</th>
+        <th>&nbsp;</th>
+    </tr>
+    <?php 
+	$class = '';
+	$i = 1; 
+	foreach ($supplierInformations as $supplierInformation) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $i;?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->NAME);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->SHORT_NAME);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->ADDRESS);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->PHONE);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->FAX);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->MOBILE);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->WEB);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->EMAIL);?></td>
+        <td><?php echo $this->escapeHtml($supplierInformation->BUSINESS_DATE);?></td>
+        <td>
+            <a href="<?php echo $this->url('supplierinformation',array('action'=>'edit', 'id' => $supplierInformation->SUPPLIER_INFO_ID));?>">Edit</a>
+            <!-- <a href="<?php //echo $this->url('supplierinformation',array('action'=>'delete', 'id' => $supplierInformation->ORG_TYPE_ID));?>">Delete</a> -->
+        </td>
+    </tr>
+    <?php $i++; endforeach; ?>
+</table>
+<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	echo $this->paginationControl($supplierInformations,'sliding',array('partial/paginator.phtml', 'SupplierInformation'),array('route' => 'supplierinformation'));
+?>
+</span>

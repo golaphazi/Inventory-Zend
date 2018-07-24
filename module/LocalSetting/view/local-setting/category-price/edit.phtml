@@ -1,0 +1,121 @@
+<?php
+	$title = 'Edit Price';
+	$this->headTitle($title);
+?>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#CATEGORY_ID").focus();
+		
+	});
+	function getPriceData() {
+		if(document.getElementById('CATEGORY_ID').value=="") {
+			//alert("Please input occupation");
+			document.getElementById('CATEGORY_ID').focus();
+			return false;
+		}	
+		if(document.getElementById('BUY_PRICE').value=="") {
+			//alert("Please input occupation");
+			document.getElementById('BUY_PRICE').focus();
+			return false;
+		}
+		if(document.getElementById('SALE_PRICE').value=="") {
+			//alert("Please input occupation");
+			document.getElementById('SALE_PRICE').focus();
+			return false;
+		}
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+</script>
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url(
+		'categoryprice',
+		array(
+			'action'	=> 'edit',
+			'id'		=> $this->id,
+		)));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	$categoryIdd = $categoryPrice->CATEGORY_ID;
+	$BUY_PRICE = $categoryPrice->BUY_PRICE;
+	$SALE_PRICE = $categoryPrice->SALE_PRICE;
+	$catData = '';
+	for($i = 0;$i<sizeof($catPriceData['CATEGORY_ID']);$i++){
+		$catName 	= $catPriceData['CAT_NAME'][$i];
+		$catId 		= $catPriceData['CATEGORY_ID'][$i];
+		if($catId == $categoryIdd){
+			$catData .= '<option value="'.$catId.'" selected="selected">'.$catName.'</option>';
+		} else {
+			$catData .= '<option value="'.$catId.'">'.$catName.'</option>';
+		}
+	}
+	//echo "<pre>"; print_r($catPriceData);die();
+?>
+<table width="50%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr valign="top">
+        <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+    </tr>
+    <tr valign="middle">
+        <td align="right">&nbsp;</td>
+        <td align="right">Category</td>
+        <td align="left">:</td>
+        <td align="left">
+            <select name="CATEGORY_ID" id="CATEGORY_ID">
+            	<option value="">Select</option>
+                <?php echo $catData;?>
+            </select>
+        </td>
+    </tr>
+    <tr valign="middle">
+        <td align="right">&nbsp;</td>
+        <td align="right">Buy/Dealer Price</td>
+        <td align="left">:</td>
+        <td align="left">
+        	<input type="hidden" name="CAT_PRICE_ID" value="<?php echo $this->id;?>"/>
+        	<input  style="text-align:right;" type="text" name="BUY_PRICE" id="BUY_PRICE" value="<?php echo $BUY_PRICE;?>" />
+        </td>
+    </tr>
+    <tr valign="middle">
+        <td align="right">&nbsp;</td>
+        <td align="right">Sale/Retailer Price</td>
+        <td align="left">:</td>
+        <td align="left">
+        	<input  style="text-align:right;" type="text" name="SALE_PRICE" id="SALE_PRICE" value="<?php echo $SALE_PRICE;?>" />
+        </td>
+    </tr>
+    <tr valign="top">
+        <td align="right">&nbsp;</td>
+        <td align="right">&nbsp;</td>
+        <td align="left">&nbsp;</td>
+        <td align="left">
+            <?php echo $this->formSubmit($form->get('submit'));?>
+            
+        </td>
+    </tr>
+</table>
+<?php
+	echo $this->form()->closeTag();
+?>
+
+
+
+
+<script>
+$('form#categoryprice input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					getPriceData();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

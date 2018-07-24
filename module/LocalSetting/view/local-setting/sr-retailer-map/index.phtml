@@ -1,0 +1,56 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+	<a href="<?php echo $this->url('srretailermap', array('action'=>'add'));?>">Add SR and Retailer Map</a> &nbsp;
+	<a href="<?php echo $this->url('srretailermap', array('action'=>'edit'));?>">Edit SR and Retailer Map</a> &nbsp;
+</p>
+<?php
+	$coaTitle = 'SR and Retailer Map';
+	$this->headTitle($coaTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>SL#</th>
+        <th>SR NAME</th>
+        <th>RETAILER NAME</th>
+        <th>SHOP</th>
+        <th>MAPPING STARTS AT</th>
+        <!--<th>END DATE</th>-->
+        <th>GENERATE DATE</th>
+        <!--<th>Action</th>-->
+    </tr>
+    <?php 
+	$class = '';
+	$i = 1; 
+	foreach ($srRetailerMaps as $srRetailerMap) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $i;?></td>
+        <td><?php echo $this->escapeHtml($srRetailerMap->EMPLOYEE_NAME);?></td>
+        <td><?php echo $this->escapeHtml($srRetailerMap->NAME);?></td>
+        <td><?php echo $this->escapeHtml($srRetailerMap->SHOP_NAME);?></td>
+        <td><?php echo $this->escapeHtml($srRetailerMap->START_DATE);?></td>
+        <!--<td><?php //echo $this->escapeHtml($srRetailerMap->END_DATE);?></td>-->
+        <td><?php echo $this->escapeHtml($srRetailerMap->BUSINESS_DATE);?></td>
+        <td>
+            
+            <!-- <a href="<?php echo $this->url('srretailermap',array('action'=>'edit', 'id' => $srRetailerMap->SR_RETAILER_MAP_ID));?>">Edit</a>-->
+        </td>
+    </tr>
+    <?php $i++; endforeach; ?>
+</table>
+<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	//echo $this->paginationControl($srRetailerMaps,'sliding',array('partial/paginator.phtml', 'ZoneInformation'),array('route' => 'srretailermap'));
+?>
+</span>

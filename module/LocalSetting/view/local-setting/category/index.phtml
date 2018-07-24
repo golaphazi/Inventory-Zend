@@ -1,0 +1,63 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+<a href="<?php echo $this->url('category', array('action'=>'add'));?>">Add Category</a>
+</p>
+<?php
+	$coaTitle = 'Category Information';
+	$this->headTitle($coaTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th width="60%">Product/Category Name</th>
+        <th width="30%">Product Code</th>
+        <th width="10%">&nbsp;</th>
+    </tr>
+    <?php 
+	$class = '';
+	foreach ($categoryTableViews as $categoryData) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+		$style = ($categoryData->NODE_DEPTH == 2) ? 'style="font-weight:bold;"' : '';
+	?>
+    <tr class="<?php echo $class; ?>" <?php echo $style; ?> >
+        <td><?php echo str_replace('-','&nbsp;',$categoryData->CDOT); echo $categoryData->CATEGORY_NAME;?></td>
+        <td><?php echo $categoryData->P_CODE;?></td>
+        <td style="display:no ne">
+        	<a href="<?php echo $this->url('category',array('action'=>'edit', 'id' => $categoryData->CATEGORY_ID));?>">Edit</a>
+            <a href="<?php echo $this->url('category',array('action'=>'delete', 'id' => $categoryData->CATEGORY_ID));?>">Delete</a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+<!--<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	//echo $this->paginationControl($categoryTableViews,'sliding',array('partial/paginator.phtml', 'Category'),array('route' => 'category'));
+?>
+</span>-->
+<script type="application/javascript">
+	function getDeleteSystemCategory(systemNavId) {
+		if(!confirm('Are you sure, you want to delete?')) {
+			return false;
+		} else {
+			var url = '/category/deleteSystemCategory?systemNavId=' + systemNavId;
+			//$.getJSON(url, function(data) {
+			$.post(url, function(data) {
+				alert(data);
+				if(data==true) {
+					window.location.href = "http://csfwm.localhost/category";
+				} else {
+					window.location.href = "http://csfwm.localhost/category";
+				}
+			});	
+		}
+	}
+</script>

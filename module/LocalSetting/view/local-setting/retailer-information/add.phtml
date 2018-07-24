@@ -1,0 +1,219 @@
+<?php
+	$title = 'Add Retailer Info';
+	$this->headTitle($title);
+	?>
+     <script type="text/javascript">
+	 $(document).ready(function(){
+			$("#ZONE_ID").focus();
+		});	
+	 
+	 function doValidationRetailerInformationForm() {
+		if(document.getElementById('ZONE_ID').value=="") {
+			//alert("Please select zone!");
+			document.getElementById('ZONE_ID').focus();
+			return false;
+		}
+		if(document.getElementById('NAME').value=="") {
+			//alert("Please input name!");
+			document.getElementById('NAME').focus();
+			return false;
+		}
+		if(document.getElementById('EMPLOYEE_ID').value=="") {
+			//alert("Please select sr!");
+			document.getElementById('EMPLOYEE_ID').focus();
+			return false;
+		}
+		if(document.getElementById('SHOP_NAME').value=="") {
+			//alert("Please input shop name!");
+			document.getElementById('SHOP_NAME').focus();
+			return false;
+		}
+		if(document.getElementById('ADDRESS').value=="") {
+			//alert("Please input address!");
+			document.getElementById('ADDRESS').focus();
+			return false;
+		}
+		if(document.getElementById('MOBILE').value=="") {
+			//alert("Please input mobile number!");
+			document.getElementById('MOBILE').focus();
+			return false;
+		}
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+	function getEmployeeName(designationId) {
+		//alert(designationId);
+		//$.post('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+		$.getJSON('/srzonemap/getEmpName',{designationId: designationId}, function(j) {
+				//alert(j);
+				if(j.length>0)
+				{
+					var options = '';
+					options += '<option value="">Select Emp. Name</option>';
+					for (var i = 0; i < j.length; i++) {
+					options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+					}
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+				else
+				{
+					options = '<option value="">Select Emp. Name</option>';
+					$("select#EMPLOYEE_ID").html('');
+					$("select#EMPLOYEE_ID").html(options);
+				}
+			});
+	} 
+	 
+	 
+	</script>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('retailerinformation',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	echo $this->formHidden($form->get('RETAILER_ID'));
+?>
+<table width="70%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+       <!--
+		<tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Zone Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ZONE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+		
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Designation</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('DESIGNATION_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+		-->
+        <!--
+		<tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">SR Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMPLOYEE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+		-->
+         <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('NAME')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Shop Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('SHOP_NAME')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ADDRESS')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Phone</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('PHONE')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Fax</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('FAX')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Mobile</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('MOBILE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Web</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('WEB')); ?>
+            	
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Email</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMAIL')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right"></td>
+            <td align="left"></td>
+            <td align="left"></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+
+<script>
+$('form#retailerInformation input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationRetailerInformationForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

@@ -1,0 +1,177 @@
+<?php
+	$title = 'Edit Product';
+	$this->headTitle($title);
+?>
+<?php
+	$form = $this->form;
+	//echo "<pre>"; print_r($navData);die();
+	$form->setAttribute('action',$this->url(
+		'category',
+		array(
+			'action'	=> 'edit',
+			'id'		=> $this->id,
+		)));
+		
+	$cont = '';	
+	//$mainCatId 		= $category[0]['MOTHER_CATEGORY_ID'];
+	$catName 		= $category[0]['CATEGORY_NAME'];
+	$description 	= $category[0]['DESCRIPTION'];
+	$CATEGORY_ID 	= $category[0]['CATEGORY_ID'];
+	$P_CODE 		= $category[0]['P_CODE'];
+	$UNIT_CAL_IN 	= $category[0]['UNIT_CAL_IN'];
+	$P_IMAGE 		= $category[0]['P_IMAGE'];
+	$ACTIVE_INACTIVE = $category[0]['ACTIVE_INACTIVE'];
+	if($ACTIVE_INACTIVE == 'yes'){
+		$checkedYes = 'checked=checked';
+		$checkedNo = '';
+	}else {
+		$checkedYes = '';
+		$checkedNo = 'checked=checked';
+	}
+	for($i=0;$i<sizeof($navData);$i++){
+		$cId 		= $navData[$i]['CATEGORY_ID'];
+		$CDOT 		= $navData[$i]['CDOT'];
+		$contName 	= $navData[$i]['CATEGORY_NAME'];
+		/*if($cId == $mainCatId){
+			$cont .="<option value='{$cId}' selected='selected'>".$CDOT."$contName</option>";
+		} else {
+			$cont .="<option value='{$cId}'>".$CDOT."$contName</option>";
+		}*/
+	}
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	//echo $this->formCollection($form);
+	
+	echo $this->formRow($form->get('CATEGORY_ID'));
+?>
+    <table width="50%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle" style="display:none;">
+            <td align="right">&nbsp;</td>
+            <td align="right">Controller</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<select name="PARENT_CATEGORY" id="PARENT_CATEGORY" style="font-family:Tahoma, Geneva, sans-serif;font-size:100%;">
+                	<option value="">Select</option>
+                    <?php echo $cont;?>
+                </select>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Category/Product</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="text" name="CATEGORY_NAME" id="CATEGORY_NAME" value="<?php echo $catName;?>"/>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Product Code</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="text" name="P_CODE" id="P_CODE" maxlength="20" value="<?php echo $P_CODE;?>"/>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Active Status</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input class="FormRadioTypeInput" type="radio" name="ACTIVE_INACTIVE" id="active_y" value="yes" <?php echo $checkedYes;?> />&nbsp;Yes 
+                <input class="FormRadioTypeInput" type="radio" name="ACTIVE_INACTIVE" id="active_n" value="no" <?php echo $checkedNo;?>/>&nbsp;No
+            </td>
+        </tr>
+        
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Description</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="hidden" value="<?php echo $CATEGORY_ID;?>" name="CATEGORY_ID">
+            	<textarea name="DESCRIPTION" id="DESCRIPTION"><?php echo $description;?></textarea>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#CATEGORY_NAME").focus();
+	});
+	
+	$("#PARENT_CONTROLLER").change(function() {
+		if ($(this).val() == '') {
+			$('#ORDER_BY').val('');
+			return;
+		}
+		//alert($(this).val());
+		var url = '/navigation/getNavigationOrder?id=' + $(this).val();
+		$.getJSON(url, function(data) {
+		//$.post(url, function(data) {
+			//alert(JSON.stringify(data));
+			var maxOrder = 0;
+			if(data.NODE_DEPTH>0) {
+				maxOrder = data.NODE_DEPTH;	
+				//alert(maxOrder);
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+			} else {
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+			}
+			return true;
+		});
+	});
+	
+	function AddCatagoryItem(){
+			if($("#CATEGORY_NAME").val() == '') {
+				//alert('Please Select Parent Controller!');
+				$("#CATEGORY_NAME").focus();
+				return false;
+			}
+			if($("#P_CODE").val() == '') {
+				//alert('Please Insert Controller Name!');
+				$("#P_CODE").focus();
+				return false;
+			}
+			
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		};
+</script>
+
+
+<script>
+$('form#category input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					AddCatagoryItem();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

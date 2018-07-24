@@ -1,0 +1,169 @@
+<?php
+	$title = 'Add Product Price';
+	$this->headTitle($title);
+?>
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('categoryprice',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	//echo $this->formCollection($form);
+	//echo $this->formRow($form->get('CAT_PRICE_ID'));
+?>
+    <table border="0" width="60%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <?php 
+			$tableTR = '';
+			$tableTR .='<tr valign="top" style="font-weight:bold; text-align:center; background:#E8E1E1;">
+							<td width="05%" align="center" style="padding-right:10px;">#Sl</td>
+							<td width="50%" align="left" style="padding-right:10px;">Category</td>
+							<td width="20%" align="left" style="padding-right:10px;">Buy/Dealer Price</td>	
+							<td width="20%" align="left" style="padding-right:10px;">Sale/Retailer Price</td>										
+						</tr>';
+			for($i=0; $i<=10; $i++){
+			$j = $i+1;
+			$tableTR .="<tr valign='center' >
+							<td  align='left' class=''>$j.</td>
+							<td  align='left' class=''>
+								 <div style='position:relative;'>
+									<input name='CATEGORY{$i}' type='text' list='CATEGORYL{$i}' id='CATEGORY{$i}'  style='width:220px;font-family:Tahoma, Geneva, sans-serif;' value='' autocomplete='off'   onfocus='coa_code_suggestD(this.value,{$i});'  onkeypress='selectOption(event,{$i})' placeholder = 'search product here'/>
+									<input name='CATEGORY_ID[]' type='hidden'  id='CATEGORY_ID{$i}' value='' />
+									<div id='empIdSuggestions{$i}' style='display:none;width:232px; height:250px; align:right;' class='ClassempIdSuggestions'>
+										<div id='suggestingEmpIdList{$i}' style='align:right;' class='ClasssuggestingEmpIdList'>
+										</div>
+									</div>
+								  <datalist id='CATEGORYL{$i}'>
+									
+								  </datalist>
+									
+								</div>
+								
+							</td>
+							<td  align='left'>
+								 <input type='text' name='buyPrice{$i}' id='buyPrice{$i}' onkeypress='next(event,{$i},1)'  class='FormNumericTypeInput' style='width:120px;' maxlength='10' autocomplete='off' placeholder = 'buy price'/>
+							</td>
+							<td  align='left'>
+								 <input type='text' name='salePrice{$i}' id='salePrice{$i}' onkeypress='next(event,{$i},2)'  class='FormNumericTypeInput' style='width:120px;' maxlength='10' autocomplete='off' placeholder = 'sale price'/>
+							</td>
+						</tr>";		
+			}
+			echo $tableTR;
+		   ?>
+        <tr valign="middle">
+            <td align="center" colspan="4">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+
+function coa_code_suggestD(inputString,no) {
+	$('#CATEGORYL'+no).html('');
+	var inputString = '';
+		$.get('/categoryprice/getSuggestCatId',{queryString: inputString, no : no},
+		function(data) {
+				$('#CATEGORYL'+no).html(data);
+		});
+}
+
+function selectOption(event,id){
+	 var x = event.which || event.keyCode;
+	//alert(x);
+	 if(x == '39'){
+		 var textstring = $("#CATEGORY"+id).val();
+		 $.get('/categoryprice/getSuggestCatId',{queryString: textstring, no : id},
+		 function(dataa){
+			 if(dataa != 0){
+				 var myArray = $.trim(dataa); 
+				 $("#CATEGORY_ID"+id).val(myArray);
+				 var idf = id+1;
+				 if(idf >= 0 || idf <= 10){
+					 //$("#CATEGORY"+idf).focus();
+					 $("#buyPrice"+id).focus();
+				 }
+				 
+			 }else{
+				 $("#CATEGORY"+id).focus();
+				 $("#CATEGORY_ID"+id).val('');
+			 }
+		 })
+	 }else if(x == '37'){
+		  var idf = id-1;
+		  if(idf >= 0 || idf <= 10){
+				$("#CATEGORY"+idf).focus();
+				$("#CATEGORY_ID"+idf).val('');
+		  }
+		 
+	 }
+}
+
+function fill_id(thisValue,no) {
+   var coaCodeHeadName = thisValue;
+  
+  if(coaCodeHeadName == '') {
+		//document.getElementById('coa_code'+no).value = '';
+		document.getElementById('CATEGORY'+no).value = '';
+		document.getElementById('CATEGORY_ID'+no).value = '';
+		return false;
+	}
+	var myArray = coaCodeHeadName.split(','); 
+	//document.getElementById('coa_codeshow'+no).innerHTML = myArray[0];
+	//document.getElementById('coa_code'+no).value = myArray[0];
+	document.getElementById('CATEGORY'+no).value = myArray[1];
+	document.getElementById('CATEGORY_ID'+no).value = myArray[0];
+											
+   $('#empIdSuggestions'+no).fadeOut();
+}
+
+
+function next(event,id,field){
+	 var x = event.which || event.keyCode;
+	 if(x == '39'){
+		 var idf = id+1;
+		 if(field == 1){			
+			$("#salePrice"+id).focus(); 
+		 }else if(field == 2){			
+			$("#CATEGORY"+idf).focus(); 
+		 }
+		 
+	 }else if(x == '37'){
+		 if(field == 1){
+			$("#CATEGORY"+id).focus(); 
+		 }else if(field == 2){			
+			$("#buyPrice"+id).focus(); 
+		 }
+	 }
+	
+}
+
+
+
+
+	$(document).ready(function() {
+		$("#CATEGORY0").focus();
+		
+	});
+</script>
+
+<script>
+$('form#price').keydown(function (e) {
+			
+			if (e.keyCode == 13) {
+				//alert();
+				var inputs = $(this).parents("form").eq(0).find(":input");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					return false;
+				}
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

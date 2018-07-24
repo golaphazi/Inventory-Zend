@@ -1,0 +1,44 @@
+
+<?php if(count($flashMessages)) : 
+	foreach ($flashMessages as $msg) :
+		echo $msg;
+	endforeach;
+   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+<a href="<?php echo $this->url('categoryprice', array('action'=>'add'));?>">Add CategoryPrice</a>
+</p>
+<?php
+	$controlTitle = 'Category Price';
+	$this->headTitle($controlTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($controlTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>Product Name</th>
+        <th>Buy/Dealer Price</th>
+        <th>Sale/Retailer Price</th>
+        <th>&nbsp;</th>
+    </tr>
+    
+    <?php $class = '';foreach ($controls as $control) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $this->escapeHtml($control->CATEGORY_NAME);?></td>
+        <td><?php echo $this->escapeHtml(number_format($control->BUY_PRICE,2));?></td>
+        <td><?php echo $this->escapeHtml(number_format($control->SALE_PRICE,2));?></td>
+        <td style="display:n one">
+            <a href="<?php echo $this->url('categoryprice',
+            array('action'=>'edit', 'id' => $control->CAT_PRICE_ID));?>">Edit</a>
+            <a href="<?php echo $this->url('categoryprice',
+            array('action'=>'delete', 'id' => $control->CAT_PRICE_ID));?>">Delete</a>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+    
+</table>

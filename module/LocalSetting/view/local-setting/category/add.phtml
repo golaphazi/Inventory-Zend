@@ -1,0 +1,302 @@
+<?php
+	$title = 'Add Category';
+	$this->headTitle($title);
+?>
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('category',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	//echo $this->formCollection($form);
+	
+	echo $this->formRow($form->get('CATEGORY_ID'));
+?>
+    <table align="left" border="0" width="60%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Category</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('PARENT_CATEGORY')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Sub Category</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('CATEGORY_NAME')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Order By</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ORDER_BY')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Price</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input class="FormRadioTypeInput" type="radio" name="adddPrice" id="adddPrice_y" value="y" onclick="priceDisplay('yes')" />&nbsp;Yes 
+                <input class="FormRadioTypeInput" type="radio" name="adddPrice" id="adddPrice_n" value="n" checked="checked" onclick="priceDisplay('no')"  />&nbsp;No
+            </td>
+        </tr>
+        <tr valign="middle" id="addPrice" style="display:none;">
+            <td align="right">&nbsp;</td>
+            <td align="right">Buy/Dealer Price</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('BUY_PRICE')); ?>       	
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle" id="retailerPrice" style="display:none;">
+            <td align="right">&nbsp;</td>
+            <td align="right">Sale/Retailer Price</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('SALE_PRICE')); ?>       	
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        
+        <tr valign="middle" id="lastLev" style="display:none;">
+            <td align="right">&nbsp;</td>
+            <td align="right">Last Level</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input class="FormRadioTypeInput" type="radio" name="LAST_LEVEL" id="LastLevel_y" value="y"/>&nbsp;Yes 
+                <input class="FormRadioTypeInput" type="radio" name="LAST_LEVEL" id="LastLevel_n" value="n" checked="checked"/>&nbsp;No  
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Product Code</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="text" name="P_CODE" id="P_CODE" maxlength="20" style="padding-left:10px;font-family:Tahoma, Geneva, sans-serif; font-size:100%;" value="" placeholder = "input product code"/>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Unit Calculation In</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<select name="UNIT_CAL_IN" id="UNIT_CAL_IN" style="padding-left:10px;font-family:Tahoma, Geneva, sans-serif; font-size:100%;" >
+                	<option value="">~~ please choose ~~</option>
+                    <option value="piece" selected="selected">piece </option>
+                    <option value="metres">metres </option>
+                    <option value="inches">inches </option>
+                    <option value="feet">feet </option>
+                    <option value="yards">yards </option>
+                    <option value="nanometres">nanometres </option>
+                    <option value="micrometres">micrometres </option>
+                    <option value="millimetres">millimetres </option>
+                    <option value="centimetres">centimetres </option>
+                    <option value="metres">metres </option>
+                    <option value="kilometres">kilometres </option>                    
+                    <option value="square metres">square metres </option>
+                    <option value="barns">barns </option>
+                    <option value="circular mils">circular mils </option>
+                    <option value="circular inches">circular inches </option>
+                    <option value="square inches">square inches </option>
+                    <option value="square feet">square feet </option>
+                    <option value="square yards">square yards </option>
+                    <option value="acres">acres </option>
+                    <option value="square miles">square miles </option>
+                    <option value="square mm">square mm </option>
+                    <option value="square cm">square cm </option>
+                    <option value="square metres">square metres </option>
+                    <option value="kilograms">kilograms </option>
+                    <option value="grains">grains </option>
+                    <option value="pounds">pounds[lb] </option>
+                    <option value="micrograms">micrograms </option>
+                    <option value="milligrams">milligrams[ml] </option>
+                    <option value="grams">grams[g] </option>
+                    <option value="kilograms">kilograms[kg] </option>
+                    <option value="tonnes">tonnes </option>
+                </select>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Select Image (file size: less than 1MB, extention: jpg,gif,png)</td>
+            <td align="left">:</td>
+            <td align="center">
+            	<?php echo $this->formRow($form->get('P_IMAGE')); ?>
+            </td>
+        </tr>
+         <tr valign="middle">
+            <td colspan="4" align="center">
+                 <div id="fileDisplayAreaAPP" style="width:80px;">
+                    <img src="../img/no_image.png" id="principal_app_photo_view" width="80" />
+                 </div>
+            </td>
+        </tr>
+        <tr valign="top" >
+            <td align="right">&nbsp;</td>
+            <td align="right">Description</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="hidden" name="P_CAT_NAME" id="P_CAT_NAME" value="0"/>
+                <input type="hidden" name="NODEDEPTH" id="NODEDEPTH" value="0"/>
+                <input type="hidden" name="P_COA_CODE" id="P_COA_CODE" value="0"/>
+            	<?php echo $this->formRow($form->get('DESCRIPTION')); ?>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#PARENT_CATEGORY").focus();
+	});
+	
+	function priceDisplay(val){
+		if (val == 'yes') {
+			$('#addPrice').css('display', '');
+			$('#retailerPrice').css('display', '');
+			return;
+		} else {
+			$('#addPrice').css('display', 'none');
+			$('#retailerPrice').css('display', 'none');
+		}
+	}
+
+	$("#PARENT_CATEGORY").change(function() {
+		if ($(this).val() == '') {
+			$('#ORDER_BY').val('');
+			return;
+		}
+		//alert($(this).val());
+		var url = '/category/getCategoryOrder?id=' + $(this).val();
+		$.getJSON(url, function(data) {
+		//$.post(url, function(data) {
+			//alert(data);
+			var maxOrder 	= 0;
+			var maxNode 	= 0;
+			var coaCode 	= 0;
+			var pcatname 	= 0;
+			if(data.ORDER_BY>0) {
+				maxOrder 	= data.ORDER_BY;
+				maxNode 	= data.NODE_DEPTH;
+				if(maxNode>1){
+					$('#lastLev').css('display', '');
+				} else {
+					$('#lastLev').css('display', 'none');
+				}
+				coaCode 	= data.COA_CODE;
+				pcatname 	= data.CATEGORY_NAME;	
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+				$('#NODEDEPTH').val('');
+				$('#NODEDEPTH').val(maxNode);
+				$('#P_COA_CODE').val('');
+				$('#P_COA_CODE').val(coaCode);
+				$('#P_CAT_NAME').val('');
+				$('#P_CAT_NAME').val(pcatname);
+			} else {
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+			}
+			return true;
+		});
+	});
+	
+	function AddCatagoryItem(){
+			
+			if($("#PARENT_CATEGORY").val() == '') {
+				//alert('Please Select Parent Category!');
+				
+				$("#PARENT_CATEGORY").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if($("#CATEGORY_NAME").val() == '') {
+				//alert('Please Insert Category Name!');
+				$("#PARENT_CATEGORY").css({"border":"1px solid green"});
+				$("#CATEGORY_NAME").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			var priceaddd = $('input[name=adddPrice]:checked').val();
+			if(priceaddd == 'y') {
+				if($("#PRICE").val() == '') {
+					$("#PRICE").focus().css({"border":"1px solid red"});
+					return false;
+				}
+				return false;
+			}
+			
+			if($("#CONTROLLER_NAME_UI").val() == '') {
+				//alert('Please Insert Controller UI Name!');
+				$("#CONTROLLER_NAME_UI").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		};
+		
+	function imageUpload(id,displayArea) {
+		var fileInput = document.getElementById(id);
+		var fileDisplayArea = document.getElementById(displayArea);
+		//alert(fileInput);
+		//alert(fileDisplayArea);
+		//fileInput.addEventListener('change', function(e) {
+			var file = fileInput.files[0];
+			var imageType = /image.*/;
+			//alert(file);							
+			if (file.type.match(imageType)) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					fileDisplayArea.innerHTML = "";
+					var img = new Image();
+					img.src = reader.result;
+					fileDisplayArea.appendChild(img);
+				}
+				reader.readAsDataURL(file);	
+			} else {
+				//fileDisplayArea.innerHTML = "File not supported!";
+				var docSRC = '../img/document_icon.png';
+				fileDisplayArea.innerHTML = "<img src=" + docSRC + " />";										
+			}
+		//});
+	}
+</script>
+
+<script>
+$('form#category input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					AddCatagoryItem();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

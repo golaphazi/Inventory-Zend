@@ -1,0 +1,173 @@
+<?php
+	$title = 'Edit SR Target';
+	$this->headTitle($title);
+?>
+ <script type="text/javascript">
+	$(document).ready(function() {
+		$("#EMPLOYEE_ID").focus();
+		$('#START_DATE').datepicker({									
+			dateFormat : 'dd-mm-yy'
+		});
+		$('#END_DATE').datepicker({									
+			dateFormat : 'dd-mm-yy'
+		});	
+		
+	});
+  function checkCalender(thisDate,businessDate) {
+				//alert(String(businessDate));
+				var fromDate = String($("#START_DATE").val());
+				var toDate = String($("#END_DATE").val());
+				if((fromDate != '') && (toDate != '')){                        
+					var tempFromDate = fromDate.split('-'); 
+					var tempToDate = toDate.split('-');                        
+					var a = tempFromDate[1]+'/'+tempFromDate[0]+'/'+tempFromDate[2];
+					var b = tempToDate[1]+'/'+tempToDate[0]+'/'+tempToDate[2];
+					if((dates.compare(b,a) == 1) || (dates.compare(b,a) == 0)) {
+						return true;
+					} else {
+						alert('Invalid Date Range!');
+						$("#END_DATE").attr("value",businessDate);
+						return false;
+					}
+				}
+			}
+	 
+	 $(document).ready(function(){
+			$("#DESIGNATION_ID").focus();
+		});
+	 function doValidationSrTargetForm() {
+		if(document.getElementById('DESIGNATION_ID').value=="") {
+			//alert("Please select Designation!");
+			document.getElementById('DESIGNATION_ID').focus();
+			return false;
+		}
+		if(document.getElementById('EMPLOYEE_ID').value=="") {
+			//alert("Please select SR name!");
+			document.getElementById('EMPLOYEE_ID').focus();
+			return false;
+		}
+		
+		if(document.getElementById('START_DATE').value=="") {
+			//alert("Please select Date From!");
+			document.getElementById('START_DATE').focus();
+			return false;
+		}
+		if(document.getElementById('END_DATE').value=="") {
+			//alert("Please select Date To!");
+			document.getElementById('END_DATE').focus();
+			return false;
+		}
+		if(!confirm('Are you sure, you want to proceed?')){
+			return false;
+		}
+		return true;
+	}
+	 
+	 
+	</script>
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url(
+		'srtarget',
+		array(
+			'action'	=> 'edit',
+			'id'		=> $this->id,
+		)));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	echo $this->formHidden($form->get('SR_TARGET_ID'));
+?>
+<table width="70%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+       <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">SR Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMPLOYEE_ID')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+         <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Calculate In</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('CALCULATE_IN')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+         <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Target Value</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('TARGET_VALUE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+         <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Start Date</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('START_DATE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+         <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">End Date</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('END_DATE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+       <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Remarks</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('REMARKS')); ?>
+            </td>
+        </tr>
+       
+     
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right"></td>
+            <td align="left"></td>
+            <td align="left"></td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type="reset"  name="Reset" value="Reset" />
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+	<script>
+$('form#srTarget input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationSrTargetForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

@@ -1,0 +1,51 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+	<a href="<?php echo $this->url('zoneinformation', array('action'=>'add'));?>">Add Zone</a> &nbsp;
+</p>
+<?php
+	$coaTitle = 'Zone Information';
+	$this->headTitle($coaTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($coaTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>SL#</th>
+        <th>NAME</th>
+        <th>SHORT NAME</th>
+        <th>ADDRESS</th>
+        <th>BUSINESS DATE</th>
+        <th>&nbsp;</th>
+    </tr>
+    <?php 
+	$class = '';
+	$i = 1; 
+	foreach ($zoneInformations as $zoneInformation) : 
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $i;?></td>
+        <td><?php echo $this->escapeHtml($zoneInformation->NAME);?></td>
+        <td><?php echo $this->escapeHtml($zoneInformation->SHORT_NAME);?></td>
+        <td><?php echo $this->escapeHtml($zoneInformation->ADDRESS);?></td>
+        <td><?php echo $this->escapeHtml($zoneInformation->BUSINESS_DATE);?></td>
+        <td>
+            <a href="<?php echo $this->url('zoneinformation',array('action'=>'edit', 'id' => $zoneInformation->ZONE_ID));?>">Edit</a>
+            <!-- <a href="<?php //echo $this->url('zoneinformation',array('action'=>'delete', 'id' => $zoneInformation->ORG_TYPE_ID));?>">Delete</a> -->
+        </td>
+    </tr>
+    <?php $i++; endforeach; ?>
+</table>
+<span style="font-family:Tahoma, Geneva, sans-serif;font-size:85%;">
+<?php 
+	echo $this->paginationControl($zoneInformations,'sliding',array('partial/paginator.phtml', 'ZoneInformation'),array('route' => 'zoneinformation'));
+?>
+</span>

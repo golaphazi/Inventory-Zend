@@ -1,0 +1,130 @@
+<?php
+	$title = 'Edit Supplier wise Product';
+	$this->headTitle($title);
+?>
+<?php
+	$form = $this->form;
+	//echo "<pre>"; print_r($navData);die();
+	$form->setAttribute('action',$this->url(
+		'suppwisecategory',
+		array(
+			'action'	=> 'edit',
+			'id'		=> $this->id,
+		)));
+		
+	$cont = '';	
+	$SUPP_WISE_CATEGORY_ID = $category[0]['SUPP_WISE_CATEGORY_ID'];
+	$suppName 		= $category[0]['NAME'];
+	$catName 		= $category[0]['CATEGORY_NAME'];
+	$isSupply 		= $category[0]['IS_SUPPLY'];
+	$CATEGORY_ID 	= $category[0]['CATEGORY_ID'];
+	$SUPPLIER_INFO_ID 	= $category[0]['SUPPLIER_INFO_ID'];	
+	if ($isSupply == 'yes') {
+		$radioCond = '<input type="radio" name="IS_SUPPLY" id="IS_SUPPLY_Y" value="yes" checked="checked">&nbsp;Yes&nbsp;<input type="radio" name="IS_SUPPLY" id="IS_SUPPLY_N" value="no">&nbsp;No&nbsp;';
+	} else {
+		$radioCond = '<input type="radio" name="IS_SUPPLY" id="IS_SUPPLY_Y" value="yes">&nbsp;Yes&nbsp;<input type="radio" name="IS_SUPPLY" id="IS_SUPPLY_N" value="no" checked="checked">&nbsp;No&nbsp;';
+	}
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	//echo $this->formCollection($form);
+	
+	echo $this->formRow($form->get('CATEGORY_ID'));
+?>
+    <table width="50%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Supplier</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="text" readonly="readonly" name="NAME" id="NAME" value="<?php echo $suppName;?>"/>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Product</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<input type="text" readonly="readonly" name="NAME" id="NAME" value="<?php echo $catName;?>"/>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Is supply ?</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?PHP echo $radioCond;?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+                <input type="hidden" name="SUPP_WISE_CATEGORY_ID" id="SUPP_WISE_CATEGORY_ID" value="<?php echo $SUPP_WISE_CATEGORY_ID;?>"/>
+            	<input type="hidden" name="CATEGORY_ID" id="CATEGORY_ID" value="<?php echo $CATEGORY_ID;?>"/>
+                <input type="hidden" name="SUPPLIER_INFO_ID" id="SUPPLIER_INFO_ID" value="<?php echo $SUPPLIER_INFO_ID;?>"/>
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                <input style="font-family:Tahoma, Geneva, sans-serif;font-size:100%;" type="reset"  name="Reset" value="Reset" />
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	$("#PARENT_CONTROLLER").change(function() {
+		if ($(this).val() == '') {
+			$('#ORDER_BY').val('');
+			return;
+		}
+		//alert($(this).val());
+		var url = '/navigation/getNavigationOrder?id=' + $(this).val();
+		$.getJSON(url, function(data) {
+		//$.post(url, function(data) {
+			//alert(JSON.stringify(data));
+			var maxOrder = 0;
+			if(data.NODE_DEPTH>0) {
+				maxOrder = data.NODE_DEPTH;	
+				//alert(maxOrder);
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+			} else {
+				$('#ORDER_BY').val('');
+				$('#ORDER_BY').val(maxOrder);
+			}
+			return true;
+		});
+	});
+	
+	$(document).ready(function() {
+		$("#submitbutton").click(function() {
+			if($("#PARENT_CONTROLLER").val() == '') {
+				alert('Please Select Parent Controller!');
+				$("#PARENT_CONTROLLER").focus();
+				return false;
+			}
+			if($("#CONTROLLER_NAME").val() == '') {
+				alert('Please Insert Controller Name!');
+				$("#CONTROLLER_NAME").focus();
+				return false;
+			}
+			if($("#CONTROLLER_NAME_UI").val() == '') {
+				alert('Please Insert Controller UI Name!');
+				$("#CONTROLLER_NAME_UI").focus();
+				return false;
+			}
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		});
+	});
+</script>
