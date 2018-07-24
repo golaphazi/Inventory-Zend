@@ -1,0 +1,188 @@
+<?php 
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	endif;
+
+	$employeePayrollTitle 	= 'Employee Make Payroll';
+	$this->headTitle($employeePayrollTitle);
+	
+	$form 	= $this->form;
+	$form->setAttribute('action',$this->url('employeemakepayroll'));	
+	$form->prepare();
+	echo $this->form()->openTag($form);
+?>
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($employeePayrollTitle); ?></h1>
+    <table border="0" cellpadding="3" cellspacing="0" width="100%">
+        <tr>
+            <td width="23%">&nbsp;</td>
+            <td width="17%" align="right">Branch</td>
+            <td width="1%" align="center">:</td>
+            <td width="59%" align="left">
+                <select name="BRANCH_ID" id="BRANCH_ID" class = "FormSelectTypeInput" style="padding-left:10px;font-family:Tahoma, Geneva, sans-serif;font-size:100%;">
+                    <option value="">---please choose---</option>
+                    <option value="1" selected="selected">Head Office</option>
+                </select>
+            </td>
+        </tr>
+         <tr>
+            <td>&nbsp;</td>
+            <td align="right">Month - Year</td>
+            <td align="center">:</td>
+            <td align="left">
+                <select name="MONTH" id="MONTH" class = "FormDateTypeInput">
+                    <option value="01">JAN</option>
+                    <option value="02">FEB</option>
+                    <option value="03">MAR</option>                                        
+                    <option value="04">APR</option>
+                    <option value="05">MAY</option>
+                    <option value="06">JUN</option>                                        
+                    <option value="07">JUL</option>
+                    <option value="08">AUG</option>
+                    <option value="09">SEP</option>                                        
+                    <option value="10">OCT</option>
+                    <option value="11">NOV</option>
+                    <option value="12">DEC</option>
+                </select>
+                &nbsp;
+                <select name="YEAR" id="YEAR" class = "FormDateTypeInput">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                </select>
+            </td>
+        </tr>
+         <tr>
+             <td>&nbsp;</td>
+             <td>&nbsp;</td>
+             <td>&nbsp;</td>
+             <td>&nbsp;</td>
+         </tr>
+    </table>
+    <table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;" border="0">
+        <tr>
+            <th width="5%"><input type='checkbox' name='checkAll' onclick="check('cheque_details')" id='cheque_details_all' value='' disabled="disabled"></th>
+            <th width="20%">Name</th>
+            <th width="10%">Type</th> 
+            <th width="15%">Branch</th>
+            <th width="20%">Department</th>
+            <th width="20%">Designation</th>
+            <th width="10%">Salary Amount</th>
+        </tr>
+        <?php 	$class 			= '';
+                $SL				= 1;
+                $DATA_FOUND		= 0;
+                $FOUND_MESSAGE	= '';
+                $FOUND_CLASS	= '';
+                $class 			= 'oddRow';
+                
+                foreach ($investorprofiles as $investorprofile) : // <-- change here! 
+                if($class == 'evenRow') {
+                    $class = 'oddRow';
+                } else {
+                    $class = 'evenRow';
+                }
+                $DATA_FOUND	= 1;
+        ?>
+            <tr class="<?php echo $class; ?>">
+                <td>
+                    <input type='checkbox' id='cheque_details<?php echo $SL; ?>' name='EMPLOYEE_ID[]' value='<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>' onclick="check_me('cheque_details');getEnableDisable();"/>
+                </td>
+                <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_NAME);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_TYPE);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->BRANCH_NAME);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->DIVISION_NAME);?></td>     
+                <td><?php echo $this->escapeHtml($investorprofile->DESIGNATION);?></td>
+                <td>
+                   <input id="SALARY_AMOUNT<?php echo $SL; ?>" class="FormNumericTypeInput" type="text" autocomplete="off" maxlength="10" value="<?php echo $this->escapeHtml($investorprofile->SALARY_AMOUNT); ?>" style="width:80px;" onkeyup="removeChar(this);" name="SALARY_AMOUNT_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" disabled="disabled">
+                   <input type="hidden" value="<?php echo $this->escapeHtml($investorprofile->PAYABLE_COA_NAME); ?>" name="PAYABLE_COA_NAME_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>">
+                   <input type="hidden" value="<?php echo $this->escapeHtml($investorprofile->PAYABLE_COA_CODE); ?>" name="PAYABLE_COA_CODE_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>">
+                   <input type="hidden" value="<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_NAME); ?>" name="EMPLOYEE_NAME_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>">
+                </td>
+            </tr>
+        <?php 
+            $SL++;
+            endforeach;
+            if($DATA_FOUND) {
+                $FOUND_MESSAGE	= '';
+                $FOUND_CLASS	= '';	
+            } else {
+                $FOUND_MESSAGE	= 'No Data Found.';
+                $FOUND_CLASS	= 'error_msg';	
+            }  
+        ?>
+        
+        <tr class="<?php echo $class; ?>">
+            <td colspan="7" class="<?php echo $FOUND_CLASS; ?>" align="center"><?php echo $FOUND_MESSAGE;?>
+            	<?php
+					if($DATA_FOUND) {
+						echo $this->formSubmit($form->get('submit'));
+					}
+				?>
+            </td>
+            <input type='hidden' name='num_of_cheque_details' id='num_of_cheque_details' value='<?php echo $SL; ?>'/>
+        </tr>
+    </table>
+
+<script type="text/javascript">
+	function getEnableDisable() {
+		var num_items = document.getElementById('num_of_cheque_details').value;
+		
+		for(var i=1;i<num_items;i++) {
+			if(document.getElementById('cheque_details'+i).checked == true) {
+				document.getElementById('SALARY_AMOUNT'+i).disabled = false;
+			} else {
+				if($("#SALARY_AMOUNT"+i).val() == '') {
+					$("#SALARY_AMOUNT"+i).val('');
+				}
+				document.getElementById('SALARY_AMOUNT'+i).disabled = true;
+			}
+		}
+	}
+	
+	function doValidationEmployeeMakePayroll() {
+		var empchkflag 	= false;
+	
+		var num_items 	= document.getElementById('num_of_cheque_details').value;
+		for(var i=1;i<num_items;i++) {
+			if(document.getElementById('cheque_details'+i).checked == true) {
+				empchkflag = true;
+				
+				if($("#SALARY_AMOUNT"+i).val() == '') {
+					alert('Please Enter Salary Amount!');
+					$("#SALARY_AMOUNT"+i).focus();
+					return false;
+				}
+			}
+		}
+	
+		if(empchkflag == false) {
+			alert("Please select at least one!");
+			return false;
+		} else {
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;	
+		}	
+    }
+</script>
+<?php echo $this->form()->closeTag(); ?>
+
+<script>
+		$(document).ready(function(){
+			$("#BRANCH_ID").focus();
+		});	
+$('form#employeemakepayroll input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

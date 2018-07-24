@@ -1,0 +1,72 @@
+<?php 
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	endif;
+
+	$employeeTitle 	= 'Assign Access ID & Password for HRMS Login';
+	$this->headTitle($employeeTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($employeeTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;" border="0">
+    <tr>
+        <th width="5%">SL#</th>
+        <th width="20%">Name</th>
+        <th width="10%">Type</th> 
+        <th width="15%">Branch</th>
+        <th width="20%">Department</th>
+        <th width="20%">Designation</th>
+        <th width="10%">Action</th>
+    </tr>
+    <?php 	$class 			= '';
+			$SL				= 1;
+			$DATA_FOUND		= 0;
+			$FOUND_MESSAGE	= '';
+			$FOUND_CLASS	= '';
+			$class 			= 'oddRow';
+			
+			foreach ($investorprofiles as $investorprofile) : // <-- change here! 
+			if($class == 'evenRow') {
+				$class = 'oddRow';
+			} else {
+				$class = 'evenRow';
+			}
+			$DATA_FOUND	= 1;
+	?>
+        <tr class="<?php echo $class; ?>">
+            <td><?php echo $SL;?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_NAME);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_TYPE);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->BRANCH_NAME);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->DIVISION_NAME);?></td>     
+            <td><?php echo $this->escapeHtml($investorprofile->DESIGNATION);?></td>
+            <td>
+            	<?php
+                	if($this->escapeHtml($investorprofile->LOGIN_STATUS)) {
+				?>
+                	&nbsp;
+                <?php
+					} else {
+				?>
+                	<a href="<?php echo $this->url('user',array('action'=>'add', 'id' => $investorprofile->EMPLOYEE_ID));?>">Add Control</a>
+				<?php	
+                    }
+				?>
+            </td>
+        </tr>
+    <?php
+		$SL++;
+		endforeach;
+		if($DATA_FOUND) {
+			$FOUND_MESSAGE	= '';
+			$FOUND_CLASS	= '';	
+		} else {
+			$FOUND_MESSAGE	= 'No Data Found.';
+			$FOUND_CLASS	= 'error_msg';	
+		} 
+	?>
+    <tr class="<?php echo $class; ?>">
+        <td colspan="7" class="<?php echo $FOUND_CLASS; ?>" align="center"><?php echo $FOUND_MESSAGE;?></td>
+    </tr>
+</table>

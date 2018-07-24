@@ -1,0 +1,219 @@
+<?php
+	$title = 'Employee Attendance In Form';
+	$this->headTitle($title);
+
+	$officeEntryTimeTitle = 'Entry Time 09:00 AM';
+	$this->headTitle($officeEntryTimeTitle);
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+    <a href="<?php echo $this->url('employeeattendance', array('action'=>'attendanceIn'));?>">Attendance In</a>&nbsp;||
+    <a href="<?php echo $this->url('employeeattendance', array('action'=>'attendanceOut'));?>">Attendance Out</a>
+</p>
+
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($title);?></h1>
+<h4 align="center" style="font-family:Tahoma, Geneva, sans-serif; color:#0C0;"><?php echo $this->escapeHtml($officeEntryTimeTitle);?></h4>
+<?php 
+	$form->setAttribute('action',$this->url('employeeattendance',array('action' => 'attendanceIn')));
+	$form->prepare();
+?>
+<?php 
+	echo $this->form()->openTag($form); 
+?>
+
+        
+    <table border="0" width="1000px;" align="center">
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td align="right"><strong>Attendance Date :</strong></td>
+            <td align="left">
+                <?php echo $this->formRow($form->get('ATTENDANCE_DATE'));  ?>
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+    </table>
+        
+    <table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;" border="0">
+        <tr>
+            <th width="5%"><input type='checkbox' name='checkAll' onclick="check('cheque_details')" id='cheque_details_all' value='' disabled="disabled"></th>
+            <th width="20%">Name</th>
+            <th width="10%">Type</th> 
+            <th width="15%">Branch</th>
+            <th width="12%">Department</th>
+            <th width="13%">Designation</th>
+            <th width="25%">In Time (Hour:Minute:AM/PM)</th>
+        </tr>
+        <?php 	$class 			= '';
+                $SL				= 1;
+                $DATA_FOUND		= 0;
+                $FOUND_MESSAGE	= '';
+                $FOUND_CLASS	= '';
+                $class 			= 'oddRow';
+                
+                foreach ($investorprofiles as $investorprofile) : // <-- change here! 
+                if($class == 'evenRow') {
+                    $class = 'oddRow';
+                } else {
+                    $class = 'evenRow';
+                }
+                $DATA_FOUND	= 1;
+        ?>
+            <tr class="<?php echo $class; ?>">
+                <td>
+                    <input type='checkbox' id='cheque_details<?php echo $SL; ?>' name='EMPLOYEE_ID[]' value='<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>' onclick="check_me('cheque_details');getEnableDisable();"/>
+                </td>
+                <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_NAME);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_TYPE);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->BRANCH_NAME);?></td>
+                <td><?php echo $this->escapeHtml($investorprofile->DIVISION_NAME);?></td>     
+                <td><?php echo $this->escapeHtml($investorprofile->DESIGNATION);?></td>
+                <td>
+                    <?php
+                    	if($this->escapeHtml($investorprofile->IN_TIME)) {
+					?>
+                        <input type="hidden" name="EMPLOYEE_ATTENDANCE_ID_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" value="<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ATTENDANCE_ID); ?>"/> 
+                        <input name="IN_TIME_HOUR_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" class="FormDateTypeInput" id="IN_TIME_HOUR<?php echo $SL; ?>" type="text" disabled="disabled" value="<?php echo $this->escapeHtml($investorprofile->IN_TIME); ?>" style="width:40px;" placeholder = "Hour" maxlength="2" onkeyup="removeChar(this);getRightHour(this.value,<?php echo $SL; ?>);" />:
+                        <input name="IN_TIME_MINUTE_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" class="FormDateTypeInput" id="IN_TIME_MINUTE<?php echo $SL; ?>" type="text" disabled="disabled" value="<?php echo $this->escapeHtml($investorprofile->IN_TIME); ?>" style="width:45px;" placeholder = "Minute" maxlength="2" onkeyup="removeChar(this);getRightMinute(this.value,<?php echo $SL; ?>);"/>:
+                        <select name="IN_TIME_AM_PM_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" id="IN_TIME_AM_PM<?php echo $SL; ?>" style="width:85px;">
+                        	<option value="">-Select-</option>
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    <?php			
+						} else {
+					?>
+                    	<input name="IN_TIME_HOUR_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" class="FormDateTypeInput" id="IN_TIME_HOUR<?php echo $SL; ?>" type="text" disabled="disabled" value="<?php echo $this->escapeHtml($investorprofile->IN_TIME); ?>" style="width:40px;" placeholder = "Hour" maxlength="2" onkeyup="removeChar(this);getRightHour(this.value,<?php echo $SL; ?>);" />:
+                        <input name="IN_TIME_MINUTE_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" class="FormDateTypeInput" id="IN_TIME_MINUTE<?php echo $SL; ?>" type="text" disabled="disabled" value="<?php echo $this->escapeHtml($investorprofile->IN_TIME); ?>" style="width:45px;" placeholder = "Minute" maxlength="2" onkeyup="removeChar(this);getRightMinute(this.value,<?php echo $SL; ?>);"/>:
+                        <select name="IN_TIME_AM_PM_<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_ID); ?>" id="IN_TIME_AM_PM<?php echo $SL; ?>" style="width:85px;">
+                        	<option value="">-Select-</option>
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
+                    <?php		
+						}
+					?>
+                    
+                </td>
+            </tr>
+        <?php 
+            $SL++;
+            endforeach;
+            if($DATA_FOUND) {
+                $FOUND_MESSAGE	= '';
+                $FOUND_CLASS	= '';	
+            } else {
+                $FOUND_MESSAGE	= 'No Data Found/ Attendance is Closed for Today.';
+                $FOUND_CLASS	= 'error_msg';	
+            }  
+        ?>
+        
+        <tr class="<?php echo $class; ?>">
+            <td colspan="7" class="<?php echo $FOUND_CLASS; ?>" align="center"><?php echo $FOUND_MESSAGE;?>
+            	<?php
+					if($DATA_FOUND) {
+						echo $this->formSubmit($form->get('submit'));
+					}
+				?>
+            </td>
+            <input type='hidden' name='num_of_cheque_details' id='num_of_cheque_details' value='<?php echo $SL; ?>'/>
+        </tr>
+    </table>
+<?php echo $this->form()->closeTag(); ?>
+<script type="text/javascript">
+	function getRightHour(hour,serial) {
+		var hour	= Number(hour.replace(/\,/g,""));
+		if(hour>13) {
+			alert('Please Enter Valid Hour!');
+			$("#IN_TIME_HOUR"+serial).val('');
+			$("#IN_TIME_HOUR"+serial).focus();
+			return false;
+		}else if(hour<=0) {
+			alert('Please Enter Valid Hour!');
+			$("#IN_TIME_HOUR"+serial).val('');
+			$("#IN_TIME_HOUR"+serial).focus();
+			return false;
+		}
+	}
+	
+	function getRightMinute(minute,serial) {
+		var minute	= Number(minute.replace(/\,/g,""));
+		if(minute>59) {
+			alert('Please Enter Valid Minute!');
+			$("#IN_TIME_MINUTE"+serial).val('');
+			$("#IN_TIME_MINUTE"+serial).focus();
+			return false;
+		} else if(hour<0) {
+			alert('Please Enter Valid Minute!');
+			$("#IN_TIME_MINUTE"+serial).val('');
+			$("#IN_TIME_MINUTE"+serial).focus();
+			return false;
+		}
+	}
+	
+	$(document).ready(function() {
+		$('#ATTENDANCE_DATE').datepicker({									
+			dateFormat : 'dd-mm-yy'
+		});
+	});
+	
+	function getEnableDisable() {
+		var num_items = document.getElementById('num_of_cheque_details').value;
+		
+		for(var i=1;i<num_items;i++) {
+			if(document.getElementById('cheque_details'+i).checked == true) {
+				document.getElementById('IN_TIME_HOUR'+i).disabled = false;
+				document.getElementById('IN_TIME_MINUTE'+i).disabled = false;
+				document.getElementById('IN_TIME_AM_PM'+i).disabled = false;
+			} else {
+				$("#IN_TIME_HOUR"+i).val('');
+				$("#IN_TIME_MINUTE"+i).val('');
+				$("#IN_TIME_AM_PM"+i).val('');
+				
+				document.getElementById('IN_TIME_HOUR'+i).disabled = true;
+				document.getElementById('IN_TIME_MINUTE'+i).disabled = true;
+				document.getElementById('IN_TIME_AM_PM'+i).disabled = true;
+			}
+		}
+	}
+	
+	function doValidationEmployeeAttendanceIn() {
+		var empchkflag 	= false;
+	
+		var num_items 	= document.getElementById('num_of_cheque_details').value;
+		for(var i=1;i<num_items;i++) {
+			if(document.getElementById('cheque_details'+i).checked == true) {
+				empchkflag = true;
+				
+				if($("#IN_TIME_HOUR"+i).val() == '') {
+					alert('Please Enter Hour!');
+					$("#IN_TIME_HOUR"+i).focus();
+					return false;
+				}
+				if($("#IN_TIME_MINUTE"+i).val() == '') {
+					alert('Please Enter Minute!');
+					$("#IN_TIME_MINUTE"+i).focus();
+					return false;
+				}
+				if($("#IN_TIME_AM_PM"+i).val() == '') {
+					alert('Please Enter AM/PM!');
+					$("#IN_TIME_AM_PM"+i).focus();
+					return false;
+				}
+			}
+		}
+	
+		if(empchkflag == false) {
+			alert("Please select at least one!");
+			return false;
+		} else {
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;	
+		}	
+    }
+</script>

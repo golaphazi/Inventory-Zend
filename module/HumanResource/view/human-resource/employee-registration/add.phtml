@@ -1,0 +1,650 @@
+<?php
+	$title = 'Employee Registration Form';
+	$this->headTitle($title);
+	?>
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($title);?></h1>
+	<?php
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('employeeregistration',array('action' => 'add')));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+	?>
+    
+	<table width="100%" align="center" border="0" cellspacing="0" cellpadding="10" style="font-family:Tahoma, Geneva, sans-serif;margin:0px auto 0px auto;" >
+        <tr valign="top">
+            <td width="100%" align="center">
+                <table id="DmatForm" width="100%"  border="0" cellspacing="0" cellpadding="0" align="center" style="display:block;">
+                    <tr valign="top" >
+                        <td align="left">
+							<script type="text/javascript">
+								$(document).ready(function() {	
+									$("[id*=tabs]").tabs();
+									$("#EMPLOYEE_TYPE").focus();
+									
+								});
+								
+								function Swap(tabName) {
+									$("[id*=tabs]").tabs('select', tabName);
+									if(tabName == 'contact'){
+										$("#CONTACT_ADDRESS_FIRST").focus();
+									}else if(tabName == 'academic_background'){
+										$("#LAST_CERTIFICATE").focus();
+									}else if(tabName == 'posting'){
+										$("#DESIGNATION_ID").focus();
+									}else if(tabName == 'salary'){
+										$("#SALARY_AMOUNT").focus();
+									}else{
+										
+									}
+								}
+								
+								function doValidationEmployeeRegistrationForm() {
+									// Personal Info Validation Start By Akhand
+									if($("#EMPLOYEE_TYPE").val() == '') {
+										//alert('Please select type!');
+										Swap('personal');
+										$("#EMPLOYEE_TYPE").focus();
+										return false;
+									}
+									if($("#EMPLOYEE_NAME").val() == '') {
+										//alert('Please enter name!');
+										Swap('personal');
+										$("#EMPLOYEE_NAME").focus();
+										return false;
+									}
+									if($("#FATHER_NAME").val() == '') {
+										//alert('Please enter father name!');
+										Swap('personal');
+										$("#FATHER_NAME").focus();
+										return false;
+									}
+									if($("#MOTHER_NAME").val() == '') {
+										//alert('Please enter mother name!');
+										Swap('personal');
+										$("#MOTHER_NAME").focus();
+										return false;
+									}
+									if(($("#DATE_OF_BIRTH_D").val() == '')||($("#DATE_OF_BIRTH_D").val() == 'dd')) {
+										//alert('Please enter birth day!');
+										Swap('personal');
+										$("#DATE_OF_BIRTH_D").focus();
+										return false;
+									}
+									if(($("#DATE_OF_BIRTH_M").val() == '')||($("#DATE_OF_BIRTH_M").val() == 'mm')) {
+										//alert('Please enter birth month!');
+										Swap('personal');
+										$("#DATE_OF_BIRTH_M").focus();
+										return false;
+									}
+									if(($("#DATE_OF_BIRTH_Y").val() == '')||($("#DATE_OF_BIRTH_Y").val() == 'yyyy')) {
+										//alert('Please enter birth year!');
+										Swap('personal');
+										$("#DATE_OF_BIRTH_Y").focus();
+										return false;
+									}
+									if($("#PLACE_OF_BIRTH").val() == '') {
+										//alert('Please enter birth place!');
+										Swap('personal');
+										$("#PLACE_OF_BIRTH").focus();
+										return false;
+									}
+									if($("#GENDER").val() == '') {
+										//alert('Please select gender!');
+										Swap('personal');
+										$("#GENDER").focus();
+										return false;
+									}
+									if($("#BLOOD_GROUP").val() == '') {
+										//alert('Please select blood group!');
+										Swap('personal');
+										$("#BLOOD_GROUP").focus();
+										return false;
+									}
+									if($("#RELIGION").val() == '') {
+										//alert('Please select religion!');
+										Swap('personal');
+										$("#RELIGION").focus();
+										return false;
+									}
+									if($("#MARITAL_STATUS").val() == '') {
+										//alert('Please select marital status!');
+										Swap('personal');
+										$("#MARITAL_STATUS").focus();
+										return false;
+									}
+									if($("#NATIONALITY_ID").val() == '') {
+										//alert('Please select nationality!');
+										Swap('personal');
+										$("#NATIONALITY_ID").focus();
+										return false;
+									}
+									if($("#COUNTRY_ID").val() == '') {
+										//alert('Please select country!');
+										Swap('personal');
+										$("#COUNTRY_ID").focus();
+										return false;
+									}
+									if($("#CITY_ID").val() == '') {
+										//alert('Please select city!');
+										Swap('personal');
+										$("#CITY_ID").focus();
+										return false;
+									}
+									if($("#PERMANENT_ADDRESS").val() == '') {
+										//alert('Please enter address!');
+										Swap('personal');
+										$("#PERMANENT_ADDRESS").focus();
+										return false;
+									}
+									if($("#POLICE_STATION").val() == '') {
+										//alert('Please enter police station!');
+										Swap('personal');
+										$("#POLICE_STATION").focus();
+										return false;
+									}
+									if($("#MOBILE_NUMBER").val() == '') {
+										//alert('Please enter mobile number!');
+										Swap('personal');
+										$("#MOBILE_NUMBER").focus();
+										return false;
+									}
+									// Personal Info Validation End By Akhand
+									
+									// Family Info Validation Start By Akhand
+									if($("#MARITAL_STATUS").val() == 'Married') {
+										if($("#SPOUSE_NAME").val() == '') {
+											//alert('Please enter spouse name!');
+											Swap('family');
+											$("#SPOUSE_NAME").focus();
+											return false;
+										}
+										if($("#OCCUPATION_ID").val() == '') {
+											//alert('Please select spouse occupation!');
+											Swap('family');
+											$("#OCCUPATION_ID").focus();
+											return false;
+										}
+										if($("#SPOUSE_ADDRESS").val() == '') {
+											//alert('Please enter spouse address!');
+											Swap('family');
+											$("#SPOUSE_ADDRESS").focus();
+											return false;
+										}
+									}
+									// Family Info Validation End By Akhand
+									
+									// Contact Info Validation Start By Akhand
+									if($("#CONTACT_ADDRESS_FIRST").val() == '') {
+										//alert('Please enter contact address!');
+										Swap('contact');
+										$("#CONTACT_ADDRESS_FIRST").focus();
+										return false;
+									}
+									// Contact Info Validation End By Akhand
+									
+									// Academic Info Validation Start By Akhand
+									if($("#LAST_CERTIFICATE").val() == '') {
+										//alert('Please select certificate!');
+										Swap('academic_background');
+										$("#LAST_CERTIFICATE").focus();
+										return false;
+									}
+									if($("#INSTITUTE_NAME").val() == '') {
+										//alert('Please enter institute name!');
+										Swap('academic_background');
+										$("#INSTITUTE_NAME").focus();
+										return false;
+									}
+									if($("#PASSING_YEAR").val() == '') {
+										//alert('Please enter passing year!');
+										Swap('academic_background');
+										$("#PASSING_YEAR").focus();
+										return false;
+									}
+									if($("#MARKS_OBTAIN").val() == '') {
+										//alert('Please enter marks!');
+										Swap('academic_background');
+										$("#MARKS_OBTAIN").focus();
+										return false;
+									}
+									if($("#CLASS_DIVISION").val() == '') {
+										//alert('Please select class/division!');
+										Swap('academic_background');
+										$("#CLASS_DIVISION").focus();
+										return false;
+									}
+									// Academic Info Validation End By Akhand
+									
+									// Posting Info Validation Start By Akhand
+									if($("#DESIGNATION_ID").val() == '') {
+										//alert('Please select designation!');
+										Swap('posting');
+										$("#DESIGNATION_ID").focus();
+										return false;
+									}
+									if($("#BRANCH_ID").val() == '') {
+										//alert('Please select branch!');
+										Swap('posting');
+										$("#BRANCH_ID").focus();
+										return false;
+									}
+									if($("#DIVISION_NAME").val() == '') {
+										//alert('Please select division!');
+										Swap('posting');
+										$("#DIVISION_NAME").focus();
+										return false;
+									}
+									// Posting Info Validation End By Akhand
+									
+									// Salary Info Validation Start By Akhand
+									if($("#SALARY_AMOUNT").val() == '') {
+										//alert('Please enter salary!');
+										Swap('salary');
+										$("#SALARY_AMOUNT").focus();
+										return false;
+									}
+									// Salary Info Validation End By Akhand
+									
+									if(!confirm('Are you sure, you want to proceed?')) {
+										return false;
+									}
+								}
+								
+								function getMaritalStatusFromTo() {
+									if(($("#MARITAL_STATUS").val() == '') || ($("#MARITAL_STATUS").val() != 'Married')) {
+										Swap('contact');
+										$("#CONTACT_ADDRESS_FIRST").focus();
+									} else {
+										Swap('family');	
+										$("#SPOUSE_NAME").focus();
+									}
+								}
+								
+								function getMaritalStatusToFrom() {
+									if(($("#MARITAL_STATUS").val() == '') || ($("#MARITAL_STATUS").val() != 'Married')) {
+										Swap('personal');
+										$("#EMPLOYEE_TYPE").focus();
+									} else {
+										Swap('family');	
+										$("#SPOUSE_NAME").focus();
+									}
+								}
+                            </script>
+                            
+                            <div id="tabs" style="width:100%">
+                                <ul style="font-family:Tahoma, Geneva, sans-serif; width:99%">
+                                    <li class="active filter"><a href="#personal">Personal Details</a></li>
+                                    <li><a href="#family">Family Details</a></li>
+                                    <li><a href="#contact">Contact Details</a></li>
+                                    <li><a href="#academic_background">Academic Background Details</a></li>
+                                    <li><a href="#posting">Posting Details</a></li>
+                                    <li><a href="#salary">Salary Details</a></li>
+                                </ul>
+                                <div id="personal" style="font-size:90%;" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Personal Details</legend>
+                                        <table border="0" cellpadding="0" cellspacing="0" style="margin:0px;">
+                                            <tr valign="top">
+                                                <td style="width:50%;">
+                                                    <table border="0" width="100%" cellpadding="3" cellspacing="0" style="font-size:100%;">
+                                                        <tr>
+                                                            <td width="20%" class="frm_title" align="right"><span style="color:red;">*</span>Type </td>
+                                                            <td width="20%">
+																<?php echo $this->formRow($form->get('EMPLOYEE_TYPE')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>	
+                                                            <td width="20%" class="frm_title" align="right"><span style="color:red;">*</span>Name</td>
+                                                            <td width="20%">
+                                                                <input name="EMPLOYEE_NAME" type="text"  id="EMPLOYEE_NAME" size="25" autocomplete="off"/>
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Father's Name</td>
+                                                            <td>
+                                                                <input name="FATHER_NAME" type="text"  id="FATHER_NAME" size="25" autocomplete="off"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Mother's Name</td>
+                                                            <td>
+                                                                <input name="MOTHER_NAME" type="text"  id="MOTHER_NAME" size="25" autocomplete="off"/>		                    
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Date Of Birth</td>
+                                                            <td>
+                                                                <input onblur="if(this.value=='') this.value='dd';" onfocus="if(this.value=='dd') this.value='';" value="dd" name="DATE_OF_BIRTH_D" type="text"  id="DATE_OF_BIRTH_D" autocomplete="off" style="padding-left:10px; width:40px;" maxlength="2" />&nbsp;-&nbsp;
+                                                                <input onblur="if(this.value=='') this.value='mm';" onfocus="if(this.value=='mm') this.value='';" value="mm" name="DATE_OF_BIRTH_M" type="text"  id="DATE_OF_BIRTH_M"  autocomplete="off" style="padding-left:10px;width:40px;" maxlength="2"  />&nbsp;-&nbsp;
+                                                                <input onblur="if(this.value=='') this.value='yyyy';" onfocus="if(this.value=='yyyy') this.value='';" value="yyyy" name="DATE_OF_BIRTH_Y" type="text"  id="DATE_OF_BIRTH_Y"  autocomplete="off" style="padding-left:10px;font-family:Tahoma, Geneva, sans-serif;width:53px;" maxlength="4"  onchange="DOBValidation();" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Place of Birth</td>
+                                                            <td>
+                                                                <input name="PLACE_OF_BIRTH" type="text"  id="PLACE_OF_BIRTH" size="25" autocomplete="off"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Gender</td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('GENDER')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" width="30%" align="right"><span style="color:red;">*</span>Blood Group</td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('BLOOD_GROUP')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right" valign="top">Photo</td>
+                                                            <td align="left" valign="top">
+                                                                <input name="EMPLOYEE_PHOTO" type="file" id="EMPLOYEE_PHOTO" style="width:209px;"/>
+                                                            </td>
+                                                        </tr>
+														<tr>
+                                                            <td class="frm_title" align="right" valign="top">National ID</td>
+                                                            <td align="left" valign="top">
+                                                                <input name="NATIONAL_PHOTO" type="file" id="NATIONAL_PHOTO" style="width:209px;"/>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                                <td style="width:50%;">
+                                                    <table border="0" width="100%" cellpadding="3" cellspacing="0" style="font-size:100%;">
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Religion</td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('RELIGION')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Marital Status  </td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('MARITAL_STATUS')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" height="29" align="right"><span style="color:red;">*</span>Nationality</td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('NATIONALITY_ID')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" height="29" align="right"><span style="color:red;">*</span>Country</td>
+                                                            <td>
+                                                                <?php echo $this->formRow($form->get('COUNTRY_ID')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" height="29" align="right"><span style="color:red;">*</span>City</td>
+                                                            <td>
+                                                            	<?php echo $this->formRow($form->get('CITY_ID')); ?>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="frm_title" valign="top">
+                                                            <td align="right"><span style="color:red;">*</span>Permanent Address </td>
+                                                            <td colspan="3">
+                                                                <textarea name="PERMANENT_ADDRESS" cols="30" id="PERMANENT_ADDRESS"></textarea>
+                                                            </td>
+                                                        </tr>
+                                                        <tr class="frm_title" valign="top">
+                                                            <td align="right"><span style="color:red;">*</span>PS</td>
+                                                            <td colspan="3">
+                                                                <input type="text" name="POLICE_STATION" id="POLICE_STATION" size='25' autocomplete="off"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="frm_title" align="right"><span style="color:red;">*</span>Mobile No.</td>
+                                                            <td>
+                                                                <input name="MOBILE_NUMBER" type="text"  id="MOBILE_NUMBER" onkeyup="removeChar(this)" size="25" autocomplete="off"/>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <input type="button" onclick="getMaritalStatusFromTo();" onkeyup="getMaritalStatusFromTo();" name="" id="tab_family" value="Next" />
+                                                    
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div id="family" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Family Details</legend>
+                                        <table width="100%" cellpadding="3" cellspacing="0" border="0" style="margin:0px auto 0px auto; font-size:100%;">
+                                            <tr valign="top">
+                                                <td width="40%"  class="frm_title" align="right">
+                                                    <span style="color:red">*</span>Spouse Name 
+                                                </td>
+                                                <td align="left">
+                                                    <input type="text" name="SPOUSE_NAME" id="SPOUSE_NAME" size='25' autocomplete="off"/>
+                                                </td>
+                                            </tr>
+                                            <tr valign="top" >
+                                                <td  class="frm_title" align="right">
+                                                	<span style="color:red">*</span>Spouse Occupation
+                                                </td>
+                                                <td colspan="3" align="left">
+                                                    <?php echo $this->formRow($form->get('OCCUPATION_ID')); ?>
+                                                </td>
+                                            </tr>
+                                            <tr valign="top" >
+                                                <td  class="frm_title" align="right">
+                                                	<span style="color:red">*</span>Spouse Address
+                                                </td>
+                                                <td colspan="3" align="left">
+                                                    <textarea name="SPOUSE_ADDRESS" cols="30" id="SPOUSE_ADDRESS"></textarea>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <input type="button" onclick="Swap('contact');" onkeyup="Swap('contact');" name="" id="tab_contact" value="Next" />
+                                                    <input type="button" onclick="Swap('personal');" name="" id="" value="Previous" />
+                                                   
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div id="contact" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Contact Details</legend>
+                                        <table width="100%" cellpadding="3" cellspacing="0" border="0" style="margin:0px auto 0px auto; font-size:100%;">
+                                            <tr valign="top">
+                                                <td width="30%"  class="frm_title" align="right">
+                                                    <span style="color:red">*</span>Present Address #1 
+                                                </td>
+                                                <td align="left">
+                                                    <textarea name="CONTACT_ADDRESS_FIRST" cols="30" id="CONTACT_ADDRESS_FIRST"></textarea>
+                                                </td>
+                                            </tr>
+                                            <tr valign="top" >
+                                                <td  class="frm_title" align="right">
+                                                	Present Address # 2
+                                                </td>
+                                                <td colspan="3" align="left">
+                                                    <textarea name="CONTACT_ADDRESS_SECOND" cols="30" id="CONTACT_ADDRESS_SECOND"></textarea>
+                                                </td>
+                                            </tr>
+                                            <tr valign="top">
+                                                <td   class="frm_title" height="27" align="right">Telephone </td>
+                                                <td width="42%" align="left">
+                                                    <input name="TELEPHONE" type="text" value="" onkeyup="removeChar(this)"  id="TELEPHONE" size="30" autocomplete="off" />
+                                                </td>
+                                            </tr>
+                                            <tr valign="top">
+                                                <td  class="frm_title" height="27" align="right">Email</td>
+                                                <td align="left">
+                                                    <input name="EMAIL_ADDRESS" type="text"  id="EMAIL_ADDRESS" size="30" value="" autocomplete="off"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <input type="button" onclick="Swap('academic_background');" onkeyup="Swap('academic_background');" name="" id="tab_academic_background" value="Next" />
+                                                    <input type="button" onclick="getMaritalStatusToFrom();" name="" id="" value="Previous" />
+                                                   
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div id="academic_background" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Academic Background Details</legend>
+                                        <table width="100%" cellpadding="3" cellspacing="0" border="0" style="margin:0px auto 0px auto; font-size:100%;">
+                                            <tr>
+                                                <td width="30%" class="frm_title" align="right"><span style="color:red;">*</span>Last Certificate</td>
+                                                <td>
+                                                    <?php echo $this->formRow($form->get('LAST_CERTIFICATE')); ?>
+                                                </td>
+                                            </tr>
+                                            <tr valign="top">
+                                                <td   class="frm_title" height="27" align="right"><span style="color:red;">*</span>Board/University</td>
+                                                <td width="42%" align="left">
+                                                    <input name="INSTITUTE_NAME" type="text" value="" id="INSTITUTE_NAME" size="30" autocomplete="off" />
+                                                </td>
+                                            </tr>
+                                            <tr valign="top">
+                                                <td   class="frm_title" height="27" align="right"><span style="color:red;">*</span>Passing Year</td>
+                                                <td width="42%" align="left">
+                                                    <input name="PASSING_YEAR" type="text" value="" id="PASSING_YEAR" size="30" autocomplete="off" />
+                                                </td>
+                                            </tr>
+                                            <tr valign="top">
+                                                <td   class="frm_title" height="27" align="right"><span style="color:red;">*</span>Marks /GPA</td>
+                                                <td width="42%" align="left">
+                                                    <input name="MARKS_OBTAIN" type="text" value="" id="MARKS_OBTAIN" size="30" autocomplete="off" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="frm_title" align="right"><span style="color:red;">*</span>Class/Division</td>
+                                                <td>
+                                                    <?php echo $this->formRow($form->get('CLASS_DIVISION')); ?>
+                                                </td>
+                                            </tr>
+											<tr>
+												<td class="frm_title" align="right" valign="top">Educational Document</td>
+												<td align="left" valign="top">
+													<input name="EDU_PHOTO" type="file" id="EDU_PHOTO" style="width:209px;"/>
+												</td>
+											</tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <input type="button" onclick="Swap('posting');" onkeyup="Swap('posting');" name="" id="tab_posting" value="Next" />
+                                                    <input type="button" onclick="Swap('contact');" name="" id="" value="Previous" />
+                                                   
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div id="posting" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Posting Details</legend>
+                                        <table width="100%" cellpadding="3" cellspacing="0" border="0" style="margin:0px auto 0px auto; font-size:100%;">
+                                            <tr>
+                                                <td width="40%" class="frm_title" align="right"><span style="color:red;">*</span>Designation</td>
+                                                <td>
+                                                    <?php echo $this->formRow($form->get('DESIGNATION_ID')); ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="frm_title" align="right"><span style="color:red;">*</span>Branch</td>
+                                                <td>
+                                                    <?php echo $this->formRow($form->get('BRANCH_ID')); ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="frm_title" align="right"><span style="color:red;">*</span>Division</td>
+                                                <td>
+                                                    <?php echo $this->formRow($form->get('DIVISION_NAME')); ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <input type="button" onclick="Swap('salary');" onkeyup="Swap('salary');" name="" id="tab_salary" value="Next" />
+                                                    <input type="button" onclick="Swap('academic_background');" name="" id="" value="Previous" />
+                                                    
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                                <div id="salary" class="tab_content">
+                                    <fieldset style='width:95%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+										<legend style="border:0px;font-size:100%;">Employee Salary Details</legend>
+                                        <table width="100%" cellpadding="3" cellspacing="0" border="0" style="margin:0px auto 0px auto; font-size:100%;">
+                                            <tr valign="top">
+                                                <td width="40%"  class="frm_title" align="right">
+                                                    <span style="color:red">*</span>Salary Amount
+                                                </td>
+                                                <td align="left">
+                                                    <input name="SALARY_AMOUNT" type="text" value="" onkeyup="removeChar(this)"  id="SALARY_AMOUNT" size="30" autocomplete="off" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="text-align:center">
+                                                    <?php echo $this->formRow($form->get('submit')); ?>&nbsp;
+                                                   
+                                                    
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                 </table>
+            </td>
+        </tr>
+     </table>
+<?php 
+	echo $this->form()->closeTag();
+?>
+
+<script>
+$('form#employeeregistration input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					doValidationEmployeeRegistrationForm();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

@@ -1,0 +1,146 @@
+<?php
+	$title = 'Employee Information View';
+	$this->headTitle($title);
+?>
+   <h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($title);?></h1>
+<script>
+	function PrintDiv() {    
+          var divToPrint = document.getElementById('divToPrint');
+          var popupWin = window.open('', '_blank', 'width=auto,height=auto,');
+          popupWin.document.open();
+          popupWin.document.write('<html><head><?=$this->headLink()->appendStylesheet('/print/print.css', 'screen,print');?></head><body onload="window.print();window.close();"><center>' + divToPrint.innerHTML + '<center></html>');
+          popupWin.document.close();
+        }
+</script>
+<?php
+$EMPLOYEE_NAME 				= $employeeProfile[0]['EMPLOYEE_NAME'];
+$EMAIL 						= $BRANCH_ARRAY[0]['EMAIL'];
+$webAddress 				= $BRANCH_ARRAY[0]['WEB'];
+$companyName 				= $BRANCH_ARRAY[0]['COMPANY_NAME'];
+$PHONE 						= $BRANCH_ARRAY[0]['PHONE'];
+$FAX 						= $BRANCH_ARRAY[0]['FAX'];
+$branchAddress 				= $BRANCH_ARRAY[0]['ADDRESS'];
+$branchName 				= $BRANCH_ARRAY[0]['BRANCH_NAME'];
+//echo $EMPLOYEE_NAME;
+
+?>
+<button type='button' style='border:none;background:none;font-size:25px;color:red;' onclick='PrintDiv();' ><img src="/img/printer.png" style="width:20px;height:20px;"/></button>
+		<div id='divToPrint'><div class='page'><div class='subpage'>
+			<table border='0' cellpadding='2' cellspacing='2' width='100%'  class='oddRow'>
+				<tr>
+					<td valign='top' colspan='2'> 
+							<?=$EMAIL?>
+					</td>
+					<td valign='top' align='right' >
+							<?=$webAddress?>
+					</td>
+				</tr>
+				<tr>
+					<td valign='top' colspan='3' align='center' style='height:10px;'>
+							<p class='head'><?=$companyName?></p>
+							<p clas='Subhead'><?=$branchName?></br>
+							<?=$branchAddress?> </br>
+							<?=$PHONE, $FAX?> </p>
+						</td>
+				</tr>
+				<tr>
+					<td valign='top' colspan='3' align='center' style='height:10px;'>
+							<p class='Subhead'><i>Resume Of <?=$EMPLOYEE_NAME?></i></p>
+						</td>
+				</tr>
+				<tr>
+						<td valign='top' colspan='3' align='left' style='height:10px;'>&nbsp;</td>
+				</tr>
+				<tr>
+						<td valign='top' colspan='2' align='left' >
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr>
+									<td><p class='Subhead1' style='margin-left:10%;'><b>Name <br/> Modile <br/> E-mail <br/> Address <br/></b></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><b> : <?=$EMPLOYEE_NAME?> <br/> : <?=$employeeProfile[0]['MOBILE_NUMBER'];?> <br/> : <?=$employeeProfile[0]['EMAIL_ADDRESS'];?><br/> : <?=$employeeProfile[0]['PERMANENT_ADDRESS'];?></b></p></td>
+								</tr>
+								
+							</table>
+						</td>
+						<td valign='top' colspan='1' align='right' >
+							<?php if($employeeProfile[0]['EMPLOYEE_PHOTO'] != ''){?><img style='margin-right:10%;width:150px;height:150px;border:3px solid #ddd;padding:4px;border-radius:4px;' src="<?= $this->basePath();?>/uploaddir/empphoto/<?php echo $this->escapeHtml($employeeProfile[0]['EMPLOYEE_PHOTO']);?>" /><?php }?>
+						</td>
+				</tr>
+				<tr>
+						<td valign='top' colspan='3' align='left' style='height:10px;'> <p class="head"><i>Personal Information ........</i></p> <hr width="100%" style="color:#fff;"></td>
+				</tr>	
+				<tr>
+						<td valign='top' colspan='2' align='left' >
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr>
+									<td><p class='Subhead1' style='margin-left:10%;'><i>Name <br/> Date Of Brith <br/> Gender <br/> Religion <br/> Blood Group</i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i> : <?=$EMPLOYEE_NAME?> <br/> : <?=$employeeProfile[0]['DATE_OF_BIRTH'];?> <br/> : <?=$employeeProfile[0]['GENDER'];?><br/> : <?=$employeeProfile[0]['RELIGION'];?> <br/> : <?= $employeeProfile[0]['BLOOD_GROUP']?></i></p></td>
+								</tr>
+							</table>
+							
+						</td>
+						<td valign='top' colspan='1' align='left' >
+							
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr>
+									<td><p class='Subhead1' style='margin-left:10%;'><i>Father Name <br/> Mother Name <br/> Marital Status <br/> Nationality <br/>ID Document <br/></i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i> : <?=$employeeProfile[0]['FATHER_NAME'];?> <br/> : <?=$employeeProfile[0]['MOTHER_NAME'];?> <br/> : <?=$employeeProfile[0]['MARITAL_STATUS'];?><br/> : <?=$NATIONALITY_ARRAY[0]['NATIONALITY'];?>
+									<br/>: <?php if($employeeProfile[0]['NATIONAL_PHOTO'] != ''){?><a class="hiddenRow" href="<?= $this->basePath();?>/uploaddir/document/<?php echo $this->escapeHtml($employeeProfile[0]['NATIONAL_PHOTO']);?>" Download > Download</a><?php }?>
+									</i></p></td>
+								</tr>
+							</table>
+						</td>
+				</tr>
+				<tr>
+						<td valign='top' colspan='3' align='left' style='height:10px;'> <p class="head"><i>Contact Information ........</i></p> <hr width="100%" style="color:#fff;"></td>
+				</tr>	
+				<tr>
+						<td valign='top' colspan='2' align='left' >
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr>
+									<td><p class='Subhead1' style='margin-left:10%;'><i>Address <br/> P.S <br/> City <br/> Country <br/></i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i> : <?=$employeeProfile[0]['PERMANENT_ADDRESS'];?> <br/> : <?=$employeeProfile[0]['POLICE_STATION'];?> <br/> : <?=$CITY_ARRAY[0]['CITY'];?><br/> : <?=$COUNTRY_ARRAY[0]['COUNTRY'];?></i></p></td>
+								</tr>
+							</table>
+							
+						</td>
+						<td valign='top' colspan='1' align='left' >
+							
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr>
+									<td><p class='Subhead1' style='margin-left:10%;'><i>Modile <br/> E-mail  <br/> Telephone <br/>Contact Address</i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i> : <?=$employeeProfile[0]['MOBILE_NUMBER'];?> <br/> : <?=$employeeProfile[0]['EMAIL_ADDRESS'];?><br/> : <?=$employeeProfile[0]['TELEPHONE'];?> <br/> : <?=$employeeProfile[0]['CONTACT_ADDRESS_FIRST'];?>, <?=$employeeProfile[0]['CONTACT_ADDRESS_SECOND'];?></i></p></td>
+								</tr>
+							</table>
+						</td>
+				</tr>
+				<tr>
+						<td valign='top' colspan='3' align='left' style='height:10px;'> <p class="head"><i>Educational Information ........</i></p> <hr width="100%" style="color:#fff;"></td>
+				</tr>	
+				<tr>
+						<td valign='top' colspan='2' align='left' >
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr valign="top">
+									<td><p class='Subhead1' style='margin-left:10%;'><i>Last Certificate <br/> Institute Name <br/> Passing Year <br/> C.G.P.A/ G.P.A <br/> Division <br/></i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i> : <?=$employeeProfile[0]['LAST_CERTIFICATE'];?> <br/> : <?=$employeeProfile[0]['INSTITUTE_NAME'];?> <br/> : <?=$employeeProfile[0]['PASSING_YEAR'];?><br/> : <?=$employeeProfile[0]['MARKS_OBTAIN'];?> <br/> : <?=$employeeProfile[0]['CLASS_DIVISION'];?></i></p></td>
+								</tr>
+							</table>
+							
+						</td>
+						<td valign='top' colspan='1' align='left' >
+							
+							<table border='0' cellpadding='2' cellspacing='2' width='100%'>
+								<tr valign="top">
+									<td><p class='Subhead1' style='margin-left:10%;'><i></i></p></td>
+									<td><p class='Subhead1' style='margin-left:10%;'><i><!-- : <?php if($employeeProfile[0]['EDU_PHOTO'] != ''){?><img style='margin-right:10%;width:150px;height:150px;border:3px solid #ddd;padding:4px;border-radius:4px;' src="<?= $this->basePath();?>/uploaddir/education/<?php echo $this->escapeHtml($employeeProfile[0]['EDU_PHOTO']);?>" /><?php }?> --> 
+										<br/><?php if($employeeProfile[0]['EDU_PHOTO'] != ''){?><a class="hiddenRow" href="<?= $this->basePath();?>/uploaddir/education/<?php echo $this->escapeHtml($employeeProfile[0]['EDU_PHOTO']);?>" Download > Download</a><?php }?>
+									</i></p></td>
+								</tr>
+							</table>
+						</td>
+				</tr>
+		</table>
+		</div>
+		</div>
+		</div>
+
+

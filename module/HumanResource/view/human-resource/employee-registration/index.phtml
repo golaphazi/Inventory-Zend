@@ -1,0 +1,78 @@
+<?php 
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+    <a href="<?php echo $this->url('employeeregistration', array('action'=>'add'));?>">Add Employee Registration</a>
+</p>
+<?php
+	$employeeTitle 	= 'Employee Information List';
+	$this->headTitle($employeeTitle);
+	$url_order 		= 'ASC';  
+	if ($order_by == 'EMPLOYEE_NAME') $url_order = $order == 'ASC' ? 'DESC' : 'ASC';
+	elseif ($order_by == 'EMPLOYEE_TYPE') $url_order = $order == 'ASC' ? 'DESC' : 'ASC';
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($employeeTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;" border="0">
+    <tr>
+        <th width="5%">SL#</th>
+        <th width="20%">
+            <a href="<?php echo $this->url('employeeregistration', array('order_by' => 'EMPLOYEE_NAME', 'order' => $url_order)); ?>">
+            	Name <?php if ($order_by == 'EMPLOYEE_NAME'): ?>
+                        <i class="icon-chevron-<?php echo $url_order == 'ASC' ? 'down' : 'up' ?>"></i>
+                     <?php endif; ?>
+            </a>
+        </th>
+        <th width="5%">
+        	<a href="<?php echo $this->url('employeeregistration', array('order_by' => 'EMPLOYEE_TYPE', 'order' => $url_order)); ?>">
+        	Type <?php if ($order_by == 'EMPLOYEE_TYPE'): ?>
+                    <i class="icon-chevron-<?php echo $url_order == 'ASC' ? 'down' : 'up' ?>"></i>
+                   <?php endif; ?>
+            </a>
+        </th> 
+        <th width="10%">DOB</th>
+        <th width="15%">Marital Status</th>
+        <th width="8%">Gender</th>
+        <th width="7%">Religion</th>
+        <th width="10%">Mobile No.</th>
+        <th width="10%">Photo</th>
+        <th width="20%">National Doc</th>
+        <!--<th width="20%">Education Doc</th>-->
+        <th width="5%">Action</th>
+    </tr>
+    <?php 	$class 	= '';
+			$SL		= 1;
+			foreach ($investorprofiles as $investorprofile) : // <-- change here! 
+			if($class == 'evenRow') {
+				$class = 'oddRow';
+			} else {
+				$class = 'evenRow';
+			}
+	?>
+        <tr class="<?php echo $class; ?>">
+            <td><?php echo $SL;?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_NAME);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->EMPLOYEE_TYPE);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->DATE_OF_BIRTH);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->MARITAL_STATUS);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->GENDER);?></td>
+            <td><?php echo $this->escapeHtml($investorprofile->RELIGION); ?> </td>
+            <td><?php echo $this->escapeHtml($investorprofile->MOBILE_NUMBER);?></td>
+            <td><?php if($investorprofile->EMPLOYEE_PHOTO != ''){?><img height="60px" width="60px" src="../uploaddir/empphoto/<?php echo $this->escapeHtml($investorprofile->EMPLOYEE_PHOTO);?>" /><?php }?></td>              
+            <td><?php if($investorprofile->NATIONAL_PHOTO != ''){?><a href="../uploaddir/document/<?php echo $this->escapeHtml($investorprofile->NATIONAL_PHOTO);?>" Download>Download</a><?php }?></td>            
+           <!-- <td><?php if($investorprofile->EDU_PHOTO != ''){?><a href="../uploaddir/document/<?php echo $this->escapeHtml($investorprofile->EDU_PHOTO);?>" Download>Download</a><?php }?></td>   -->         
+            <td><a href="<?php echo $this->url('employeeregistration',array('action'=>'edit', 'id' => $investorprofile->EMPLOYEE_ID));?>">Edit</a>
+			<a href="<?php echo $this->url('employeeregistration',array('action'=>'view', 'id' => $investorprofile->EMPLOYEE_ID));?>">View</a>
+			</td>
+        </tr>
+    <?php 
+		$SL++;
+		endforeach; 
+	?>
+</table>
+<?php 
+	echo $this->paginationControl($investorprofiles,'sliding',array('partial/paginator.phtml', 'EmployeeRegistration'),array('route' => 'employeeregistration','order_by' => $order_by, 'order' => $order));
+?>

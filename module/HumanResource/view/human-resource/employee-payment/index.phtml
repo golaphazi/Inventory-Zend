@@ -1,0 +1,313 @@
+<?php
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	endif;
+   
+	$title = 'Employee Payment';
+	$this->headTitle($title);
+?>
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('employeepayment'));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+?>
+    <table width="95%" class="frmTbl" border="0" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="5" align="left"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td width="18%" align="right">Employee Name<sup style="color:red;">*</sup></td>
+            <td width="1%" align="left">:</td>
+            <td width="21%" align="left">
+                <div style="position:relative; display:block;" id="showCustVoucherNo">
+                    <input name="PAYABLE_COA_NAME" id="PAYABLE_COA_NAME" type="hidden" />
+                    <input name="PAYABLE_COA_CODE" id="PAYABLE_COA_CODE" type="hidden" />
+                    <input name="EMPLOYEE_ID" id="EMPLOYEE_ID" type="hidden" />
+                    <input class="FormNumericTypeInput" name="EMPLOYEE_NAME" list="CATEGORYL" id="EMPLOYEE_NAME" type="text" onkeypress='selectOption(event,2)' autocomplete="off" value="" onkeyup="customVoucherNo_suggest(this.value);" style="width:195px;" />
+                    <div id='VoucherNoSuggestions' style='display:none; width:205px; height:205px;' class='ClassempIdSuggestions'>
+                        <div id='VoucherNoSuggestionsList' class='ClasssuggestingEmpIdList'>
+                        </div>
+                    </div>
+					<datalist id='CATEGORYL'>
+									
+					</datalist>
+                </div>
+            </td>
+            <td width="4%" rowspan="6" align="left">&nbsp;</td>
+            <td width="56%" rowspan="6" align="left" valign="top">
+                <table width="100%" border="0" cellspacing="2" cellpadding="2" align="left" style="font-style:italic; border:dotted;font-family:Tahoma, Geneva, sans-serif;">
+                <tr>
+                    <td align="right" >Ledger Balance:</td>
+                    <td align="left"><span id="ledger_balance"></span></td>
+                </tr>
+                <tr>
+                    <td width="26%" align="right" >Employee Name: </td>
+                    <td width="74%" align="left"><span id="employee_name"></span></td>
+                </tr>
+                <tr>
+                    <td align="right">Address :</td>
+                    <td align="left"><span id="employee_address"></span></td>
+                </tr>
+                <tr>
+                    <td align="right" >Mobile:</td>
+                    <td align="left"><span id="employee_mobile"></span></td>
+                </tr>
+                <tr>
+                    <td align="right" >Employee Type:</td>
+                    <td align="left"><span id="employee_type"></span></td>
+                </tr>
+                <tr>
+                    <td align="right" >Designation:</td>
+                    <td align="left"><span id="employee_designation"></span></td>
+                </tr>
+                <tr>
+                    <td align="right" >Department:</td>
+                    <td align="left"><span id="employee_department"></span></td>
+                </tr>
+            </table>            
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">Payment Type<sup style="color:red;">*</sup></td>
+            <td align="left">:</td>
+            <td align="left">
+            <input type="radio" name="PAYMENT_TYPE" id="PAYMENT_TYPE1" value="bank" checked="checked" onclick="checkPaymentType(this.value);" /> Bank
+            <input type="radio" name="PAYMENT_TYPE" id="PAYMENT_TYPE2" value="cash" onclick="checkPaymentType(this.value);"/> Cash
+            </td>
+        </tr>
+        <tr valign="middle" id="showBank">
+            <td align="right">Bank<sup style="color:red;">*</sup></td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ORG_ID')); ?>
+            	
+            </td>
+        </tr>
+        <tr valign="middle" id="showCash">
+            <td align="right">Cheque Number<sup style="color:red;">*</sup></td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('CHQ_NO')); ?>
+            	
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right"> Date<sup style="color:red;">*</sup></td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('CHQ_DATE')); ?>
+            	
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">Amount<sup style="color:red;">*</sup></td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('AMOUNT')); ?>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">Details</td>
+            <td align="left">:</td>
+            <td align="left"><?php echo $this->formRow($form->get('REMARKS')); ?></td>
+            <td align="left">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+               
+            </td>
+            <td align="left">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	function checkPaymentType(e){
+		if( e == 'bank'){
+			$("#showBank").show();
+			$("#showCash").show();
+		}
+		if( e == 'cash'){
+			$("#showBank").hide();
+			$("#showCash").hide();
+		}
+	}
+	
+	$(document).ready(function(){
+		$("#EMPLOYEE_NAME").focus();
+		var inputString = '';
+		
+		$.post("/employeepayment/fetchEmployeeName", {queryString: inputString}, 
+		function(data)
+		{
+			
+			$('#CATEGORYL').html(data);
+
+		});
+	});	
+	
+	function selectOption(event,id){
+	 var x = event.which || event.keyCode;
+	 if(x == '39'){
+		 var textstring = $("#EMPLOYEE_NAME").val();
+	//alert(textstring);
+		$.post("/employeepayment/fetchEmployeeName", {queryString: textstring}, 
+		 function(dataa){
+			// alert(dataa);
+			 if(dataa.length > 0){
+				 var myArray = $.trim(dataa); 
+				 
+				 fill_id(myArray);
+				
+			 }else{
+				 $("#EMPLOYEE_NAME").focus();
+				 $("#EMPLOYEE_ID").html('');
+				 
+			 }
+		 })
+	 }else if(x == '37'){
+		$("#EMPLOYEE_NAME").focus();
+		 
+	 }
+}
+
+function next(event,id,field){
+	 var x = event.which || event.keyCode;
+	 if(x == '39'){
+		 if(field == 1){
+			var idf = id+1;
+			$("#coa_head"+idf).focus(); 
+		 }
+		 
+	 }else if(x == '37'){
+		 if(field == 1){
+			$("#coa_head"+id).focus(); 
+		 }
+	 }
+	
+}
+	/*
+	function customVoucherNo_suggest(inputString) {
+		if(inputString.length == 0) {
+			$('#VoucherNoSuggestions').fadeOut();
+			document.getElementById('dealer_mobile').value 		= '';
+			document.getElementById('dealer_address').value 	= '';
+			document.getElementById('dealer_name').value 		= '';
+			document.getElementById('ledger_balance').value 	= '';
+		} else {
+			$.post("/employeepayment/fetchEmployeeName", {queryString: inputString,}, 
+			function(j) {
+				//alert(j);
+				if(j.length >0)  {
+					$('#VoucherNoSuggestionsList').html(j);
+					$('#VoucherNoSuggestions').fadeIn("slow");
+				} else{
+					$('#VoucherNoSuggestions').fadeOut();
+				}
+			});
+		}
+	}
+	*/
+	function fill_id(thisValue){
+	  var coaCodeHeadName = thisValue;
+	  if(coaCodeHeadName == ''){
+			document.getElementById('ledger_balance').value 		= '';
+			document.getElementById('employee_name').value 			= '';
+			document.getElementById('employee_address').value 		= '';
+			document.getElementById('employee_mobile').value 		= '';
+			document.getElementById('employee_type').value 			= '';
+			document.getElementById('employee_designation').value 	= '';
+			document.getElementById('employee_department').value	= '';
+			return false;
+		}else{
+		
+		var myArray = coaCodeHeadName.split(','); 
+		// alert(myArray[1]);
+		document.getElementById('ledger_balance').innerHTML 		= myArray[1];
+		document.getElementById('employee_name').innerHTML 			= myArray[2];
+		document.getElementById('employee_address').innerHTML 		= myArray[4];
+		document.getElementById('employee_mobile').innerHTML 		= myArray[5];
+		document.getElementById('employee_type').innerHTML 			= myArray[3];
+		document.getElementById('employee_designation').innerHTML 	= myArray[6];
+		document.getElementById('employee_department').innerHTML	= myArray[7];
+		
+		document.getElementById('PAYABLE_COA_CODE').value 			= myArray[8];
+		document.getElementById('PAYABLE_COA_NAME').value 			= myArray[9];
+		document.getElementById('EMPLOYEE_ID').value 				= myArray[0];
+		//document.getElementById('EMPLOYEE_NAME').value 				= myArray[2];
+		//$('#VoucherNoSuggestions').fadeOut();
+		//$("#PAYMENT_TYPE1").focus();
+		}
+	}
+
+		
+	
+	function employeePayment(){
+		
+			if($("#EMPLOYEE_ID").val() == ''){
+				//alert('Please Insert Employee Name!');
+				$("#EMPLOYEE_NAME").focus();
+				return false;
+			}
+			var paymentType = $('input[name=PAYMENT_TYPE]:checked').val();
+			if(paymentType == 'bank'){
+				if($("#ORG_ID").val() == ''){
+					//alert('Please Select Bank Name!');
+					$("#ORG_ID").focus();
+					return false;
+				}
+				if($("#CHQ_NO").val() == ''){
+					//alert('Please Insert Cheque No.!');
+					$("#CHQ_NO").focus();
+					return false;
+				}	
+			}	
+			
+			if($("#CHQ_DATE").val() == ''){
+				//alert('Please Select Cheque Date!');
+				$("#CHQ_DATE").focus();
+				return false;
+			}
+			if((($('#CHQ_DATE').val().length) < 10) || (($('#CHQ_DATE').val().length) > 10)){
+					//alert('Please put valid data format!');
+					$("#CHQ_DATE").focus();
+					return false;
+			}
+			if($("#AMOUNT").val() == '0.00'){
+				//alert('Please Insert Amount!');
+				$("#AMOUNT").focus();
+				return false;
+			}
+			
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		
+	};
+</script>
+<script>	
+$('form#employeepayment input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					employeePayment();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

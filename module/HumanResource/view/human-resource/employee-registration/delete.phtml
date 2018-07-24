@@ -1,0 +1,22 @@
+<?php
+	$title = 'Delete Investor';
+	$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>Are you sure that you want to delete
+	'<?php echo $this->escapeHtml($investormanagement->INVESTOR_NAME)?>'?
+</p>
+<?php
+	$url = $this->url('investormanagement', array(
+		'action'	=> 'delete',
+		'id'		=> $investormanagement->INVESTOR_DETAILS_ID,
+	));
+?>
+<form action="<?php echo $url; ?>" method="post">
+    <div>
+    	<input type="hidden" name="id" value="<?php echo (int) $investormanagement->INVESTOR_DETAILS_ID; ?>" />
+        <input type="hidden" name="portfolioCode" value="<?php //echo (int) $investormanagement->PORTFOLIO_CODE; ?>" />
+        <input type="submit" name="del" value="Yes" />
+        <input type="submit" name="del" value="No" />
+    </div>
+</form>
