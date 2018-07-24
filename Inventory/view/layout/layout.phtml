@@ -1,0 +1,140 @@
+<?php echo $this->doctype(); ?>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <?php echo $this->headTitle('IBCIA'. $this->translate(' - IBIZCare Inventory Accounts'))->setSeparator(' - ')->setAutoEscape(false) ?>
+
+        <?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0') ?>
+
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
+                        ->prependStylesheet($this->basePath() . '/css/jquery-ui-1.8.4.custom.css')
+						->prependStylesheet($this->basePath() . '/css/bootstrap-responsive.min.css')
+                        ->prependStylesheet($this->basePath() . '/css/style.css')
+                        ->prependStylesheet($this->basePath() . '/css/bootstrap.min.css')
+						->prependStylesheet($this->basePath() . '/css/default.css')
+						->prependStylesheet($this->basePath() . '/css/login.css') 
+						?>
+
+        <!-- Scripts -->
+        <?php echo $this->headScript()->prependFile($this->basePath() . '/js/html5.js', 'text/javascript', array('conditional' => 'lt IE 9',))
+									  ->prependFile($this->basePath() . '/js/jquery.ui.datepicker.js')
+									  ->prependFile($this->basePath() . '/js/jquery-ui-1.8.4.custom.min.js')
+                                      ->prependFile($this->basePath() . '/js/bootstrap.min.js')
+									  ->prependFile($this->basePath() . '/js/jquery.js')
+                                      ->prependFile($this->basePath() . '/js/functions.js') ?>
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="<?php echo $this->url('home') ?>"><img src="../img/favicon.ico" align="middle" onMouseOut="" onMouseOver="" height="15" width="30" style="vertical-align:middle;" title="IBIZCARE Financial Planning" />&nbsp;<span class="zf-green"><?php echo $this->translate('IBCIA') ?> </span></a>
+                    <div class="nav-collapse collapse">
+						<?php echo $this->navigation('NavService')->menu()->setUlClass('nav'); ?>
+                    </div><!--/.nav-collapse -->
+                    <div class="clear"></div>
+                    <div class="nav-collapse collapse">
+						<?php echo $this->navigation('NavService')->breadcrumbs()->setMinDepth(0)->setMaxDepth(5)->setPartial(array('partial/breadcrumb.phtml', 'Application'));?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <?php
+					if(isset($this->leftMenu)) {
+			?>
+            <div class="left-nav" style="font-family:Tahoma, Geneva, sans-serif; width:20%;">
+            	<h3>Inventory</h3>
+                <ul style="list-style-type:none; margin:0px;">
+                	<?php
+                    	$akhand_menu			= '';
+						
+						$akhand_black_depth_2	= 0;
+						$akhand_black_depth_3	= 0;
+						$akhand_black_depth_4	= 0;
+						$akhand_black_depth_5	= 0;
+						
+						$akhand_blue_depth_2	= 0;
+						$akhand_blue_depth_3	= 0;
+						$akhand_blue_depth_4	= 0;
+						
+						foreach($this->leftMenu as $lmenu) {
+					?>
+						<li>
+							<?php 
+								if(in_array($lmenu['SYSTEM_NAV_ID'],$this->controller)) {
+									if($lmenu['NODE_DEPTH'] == 3) {
+										$akhand_menu	= $lmenu['CONTROLLER_UI'];
+									}
+									if($lmenu['NODE_DEPTH'] == 4) {
+										if($akhand_black_depth_3) {
+											$akhand_menu			= str_repeat('&nbsp;&nbsp;',$lmenu['NODE_DEPTH']).$lmenu['CONTROLLER_UI'];
+											$akhand_blue_depth_2	= 0;
+											$akhand_blue_depth_3	= 1;	
+										} else {
+											$akhand_menu			= str_repeat('&nbsp;&nbsp;',$lmenu['NODE_DEPTH']).$lmenu['CONTROLLER_UI'];
+											$akhand_blue_depth_2	= 0;
+											$akhand_blue_depth_3	= 0;
+										}
+									}
+									if($lmenu['NODE_DEPTH'] == 5) {
+										if($akhand_black_depth_4) {
+											$akhand_menu			= str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;',($lmenu['NODE_DEPTH']+1)).$lmenu['CONTROLLER_UI'];
+											$akhand_blue_depth_3	= 0;
+											$akhand_blue_depth_4	= 1;
+										} else {
+											$akhand_menu			= str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;',($lmenu['NODE_DEPTH']-1)).$lmenu['CONTROLLER_UI'];
+											$akhand_blue_depth_3	= 0;
+											$akhand_blue_depth_4	= 0;
+										}
+									}
+							?>
+								<a href="<?php echo $this->url(str_replace(' ','',strtolower($lmenu['CONTROLLER'])));?>"><?php echo $akhand_menu; ?></a>
+							<?php
+								} else {
+									if($lmenu['NODE_DEPTH'] == 3) {
+										echo $lmenu['CONTROLLER_UI'];
+										$akhand_black_depth_3	= 1;
+									}
+									if($lmenu['NODE_DEPTH'] == 4) {
+										if($akhand_blue_depth_3) {
+											echo str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;',$lmenu['NODE_DEPTH']).$lmenu['CONTROLLER_UI'];
+											$akhand_black_depth_3	= 0;
+											$akhand_black_depth_4	= 1;	
+										} else {
+											echo str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;',($lmenu['NODE_DEPTH']-2)).$lmenu['CONTROLLER_UI'];
+											$akhand_black_depth_3	= 0;
+											$akhand_black_depth_4	= 0;	
+										}
+									}
+									//echo $lmenu['NODE_DEPTH'];
+									//echo $lmenu['CONTROLLER_UI'];
+								}
+							?>
+                        </li>
+					<?php
+						}
+					?>
+                </ul>
+            </div>
+            <?php
+            }
+			?>
+			<div class="content" style="width:80%;">
+            	<?php echo $this->content; ?>
+            </div>
+            <div class="clear"></div>
+            <hr>
+            <footer>
+                <p>&copy; 2014 - <?php echo date('Y') ?> by IBIZCARE <img src="../img/favicon.ico"/><?php echo $this->translate(' All rights reserved.') ?></p>
+            </footer>
+        </div> <!-- /container -->
+        <?php echo $this->inlineScript() ?>
+    </body>
+</html>

@@ -1,0 +1,332 @@
+<?php
+	$title = 'Stock Information Edit';
+	$this->headTitle($title);
+	?>
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($title);
+		if(count($flashMessages)) : 
+			foreach ($flashMessages as $msg) :
+				echo $msg;
+			endforeach;
+		   endif;
+		?></h1>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('stockinformationedit'));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+	?>
+     <table width="100%" border="0" cellspacing="1" cellpadding="10" style="font-family:Tahoma, Geneva, sans-serif;margin:0px auto 0px auto; font-size:85%;">
+        <tr valign="top">
+            <td align="left">
+             <script type="text/javascript">
+					$(document).ready(function() {
+						$("#marketId").focus();
+						$('#pfStatementDateFrom').datepicker({									
+							dateFormat : 'dd-mm-yy'
+						});
+						/*$('#pfStatementDateTo').datepicker({									
+							dateFormat : 'dd-M-yy'
+						});*/
+						
+						$("#goBtn").click(function() {
+								var supplierId = $("#SUPPLIER_INFO_ID").val();
+								var date = $("#pfStatementDateFrom").val();
+								var cond = $('input:radio[name=cond]:checked').val();		
+								if(supplierId=='') {
+									alert('Please Select Supplier.');
+									$('#showMarginableScripHere').fadeOut("slow");									
+									$('#preloader').fadeIn('slow');
+									$('#noDataFound').fadeIn('slow');
+									$('#preloader').fadeOut('slow');
+									$("#SUPPLIER_INFO_ID").focus();
+									return false;
+								}
+							//$.post('/stockinformationedit/getStockInformationList',{'supplierId':supplierId,'date':date,'cond': cond}, function(data) {	
+							$.getJSON('/stockinformationedit/getStockInformationList',{'supplierId':supplierId,'date':date,'cond': cond}, function(data) {
+								//alert('asdf');
+								if(data.length > 0) 
+									{
+										//alert(data);
+										$('#preloader1').fadeIn('slow');
+										$('#noDataFound').fadeOut('slow');
+										$('#preloader1').fadeOut('slow');
+										$('#showMarginableScripHere').html(data);
+										$('#showMarginableScripHere').fadeIn("slow");
+									}
+								else 
+									{
+										//alert('asdfsadf');
+										$('#showMarginableScripHere').html('');
+										$('#preloader1').fadeIn('slow');
+										$('#noDataFound').fadeIn('slow');
+										
+									}	
+							});
+						});
+					});
+					function doValidationBatchUpdateScripForm() {
+						var numOfTotScrip = document.getElementById('num_of_total_scrip').value;
+						//alert(numOfTotScrip);
+						var totScripChkFlag = false;
+						for(var j=0;j<numOfTotScrip;j++) {
+							var category = document.getElementById('instrumentCategoryName'+j).value;
+							alert(category);
+							if($('#MWI_ID_'+category+'_'+j).attr('checked')) {
+								totScripChkFlag = true;
+							}
+						}
+						if(totScripChkFlag == false) {
+							alert("Please select at least one scrip for update details !");
+							return false;
+						}
+						if(!confirm('Are you sure, you want to proceed?')){
+							return false;
+						}
+						return true;
+					}
+					function checkReset() {
+						if(!confirm("Are you sure, you want to reset Investor Application?")){
+							return false;
+						}
+						$('#preloader').fadeIn('slow');
+						//window.location.reload();
+					}
+					function checkCalender(thisDate,businessDate){
+						var fromDate = String($("#pfStatementDateFrom").val());
+						var toDate = String($("#pfStatementDateTo").val());
+						if((fromDate != '') && (toDate != '')){							
+							var tempFromDate = fromDate.split('-'); 
+							var tempToDate = toDate.split('-');							
+							var a = tempFromDate[1]+'/'+tempFromDate[0]+'/'+tempFromDate[2];
+							var b = tempToDate[1]+'/'+tempToDate[0]+'/'+tempToDate[2];													
+							if((dates.compare(b,a) == 1) || (dates.compare(b,a) == 0)) {
+								return true;
+							} else {
+								alert('Invalid Date Range!');
+								$("#pfStatementDateTo").attr("value",businessDate);
+								return false;
+							}
+						}
+					}
+					function customVoucherNo_suggest(inputString) {
+						if(inputString.length == 0)
+						{
+							$('#VoucherNoSuggestions').fadeOut();
+						} 
+						else 
+						{
+							//alert('ads');
+							var marketId = $("#marketId").val();
+							var instrumentGroupId = $("#instrumentGroupId").val();
+							//$.post('/stockinformationedit/getSuggestInstName',{'queryString':inputString,'marketId':marketId,'instrumentGroupId':instrumentGroupId,}, function(j) {	
+							$.getJSON('/stockinformationedit/getSuggestInstName',{'queryString':inputString,'marketId':marketId,'instrumentGroupId':instrumentGroupId,}, function(j) {
+							if(j.length > 0) 
+								{									
+									//alert(j);
+									$('#VoucherNoSuggestionsList').html(j);
+									$('#VoucherNoSuggestions').fadeIn("slow");
+									
+								} else{
+									$('#VoucherNoSuggestions').fadeOut();
+								}
+							});
+						}
+					}
+					function fill_id_code(thisValue,instrumentID){
+					   if(thisValue == ''){
+							document.getElementById('instrumentName').value = '';
+							return false;
+						}
+						document.getElementById('instrumentName').value = thisValue;
+						document.getElementById('instrumentID').value = instrumentID;
+						
+						$('#VoucherNoSuggestions').fadeOut();
+					}
+					function setReset() {
+						if(!confirm("Are you sure, you want to reset search parameter?")){
+							return false;
+						}
+						$('#preloader1').fadeIn('slow');
+						$('#showMarginableScripHere').html('');
+						$('#showMarginableScripHere').fadeOut("slow");
+						$('#noDataFound').fadeIn('slow');
+					}
+					function totalDRCRShow() {
+						var numOfRows = $("#NumberOfRows").val();
+						var k=0;
+						var i=0;
+						var Totaldebit = 0;
+						var TotalAmount = 0.00;
+						var TotalQty = 0.00;
+						var TotalDiscount = 0.00;
+						for(i = 0; i < numOfRows; i++){
+							if((document.getElementById('QUANTITY'+i).value !="0.00") || (document.getElementById('RATE'+i).value !="0.00")) {
+							  if((document.getElementById('TOTAL_AMOUNT'+i).value !="0.00") && (document.getElementById('NET_AMOUNT'+i).value !="")){
+								  var totalQty = document.getElementById('QUANTITY'+i).value;
+								  var totalDiscount = document.getElementById('DISCOUNT'+i).value;
+								  var totalAmount = document.getElementById('TOTAL_AMOUNT'+i).value;
+								  var netAmount = document.getElementById('NET_AMOUNT'+i).value;
+								  
+								  totalQty     = totalQty.replace(/\,/g,"");
+								  totalQty     = Number(totalQty);
+								  TotalQty     = TotalQty + totalQty;
+								  
+								  totalAmount     = totalAmount.replace(/\,/g,"");
+								  totalAmount     = Number(totalAmount);
+								  TotalAmount      = TotalAmount + totalAmount;
+								  
+								  totalDiscount     = totalDiscount.replace(/\,/g,"");
+								  totalDiscount     = Number(totalDiscount);
+								  TotalDiscount     = TotalDiscount + totalDiscount;
+								  
+								  netAmount     = netAmount.replace(/\,/g,"");
+								  netAmount     = Number(netAmount);
+								  Totaldebit      = Totaldebit + netAmount;
+							  }								
+							}
+						}
+						$("#QTYTOTAL").html(numberFormat('',TotalQty,2,',','.'));
+						$("#TOTALAMOUNT_HIDDEN").attr("value",numberFormat('',TotalAmount,2,',','.'));						
+						$("#TOTALAMOUNT").html(numberFormat('',TotalAmount,2,',','.'));
+						$("#TOTALDISCOUNT_HIDDEN").attr("value",numberFormat('',TotalDiscount,2,',','.'));
+						$("#TOTALDISCOUNT").html(numberFormat('',TotalDiscount,2,',','.'));
+						$("#NETTOTAL_HIDDEN").attr("value",numberFormat('',Totaldebit,2,',','.'));
+						$("#NETTOTAL").html(numberFormat('',Totaldebit,2,',','.'));
+					}
+					function calculateTotal(id,value,counter){
+						var total = 0.0000;
+						var discount = 0.0000;
+						var netTotal = 0.0000;
+						var avgRate = 0.0000;
+						if(id=='QUANTITY'+counter){
+							var rate = $("#RATE"+counter).val().replace(/\,/g,"");
+							rate  = Number(rate);
+							total = Number(value * rate);
+							$("#TOTAL_AMOUNT"+counter).attr("value",total.toFixed(4));
+							$("#NET_AMOUNT"+counter).attr("value",total.toFixed(4));
+							totalDRCRShow();
+						} else if(id=='RATE'+counter){
+							var quantity = $("#QUANTITY"+counter).val().replace(/\,/g,"");
+							quantity = Number(quantity);
+							value = Number(value.replace(/\,/g,""));
+							total = Number(value * quantity);
+							$("#TOTAL_AMOUNT"+counter).attr("value",total.toFixed(4));
+							$("#NET_AMOUNT"+counter).attr("value",total.toFixed(4));
+							totalDRCRShow();
+						} else if(id=='DISCOUNT'+counter){
+							discount = $("#DISCOUNT"+counter).val().replace(/\,/g,"");
+							discount  = Number(discount);
+							total = $("#TOTAL_AMOUNT"+counter).val().replace(/\,/g,"");
+							total = Number(total);
+							netTotal = Number(total - discount);
+							$("#NET_AMOUNT"+counter).attr("value",netTotal.toFixed(4));
+							var quantity = $("#QUANTITY"+counter).val().replace(/\,/g,"");
+							quantity = Number(quantity);
+							avgRate = Number(netTotal / quantity);
+							$("#AVG_RATE"+counter).attr("value",avgRate.toFixed(4));
+							totalDRCRShow();
+						}		
+					}
+					function calculateDue(){
+						var netAmount = $('#NETTOTAL').html();
+						//alert(netAmount);
+						netAmount = netAmount.replace(/\,/g,"");
+						netAmount = Number(netAmount);
+						var netPayment = $("#NET_PAYMENT").val().replace(/\,/g,"");
+						netPayment = Number(netPayment);
+						var due = Number(netAmount - netPayment);
+						$("#DUE").attr("value",due.toFixed(4));
+						return true;
+					}
+                </script>
+                <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+					<legend style='border:0px;'>Search By</legend>
+                        <form name="InvestorCurrentUnitHoldingForm" method="post">
+                            <table border="0" cellpadding="3" cellspacing="0" width="100%">
+                                <tr>
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Supplier</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%">									
+											<?php echo $this->formRow($form->get('SUPPLIER_INFO_ID')); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Date</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%">									
+											<?php echo $this->formRow($form->get('pfStatementDateFrom')); ?>
+                                    </td>
+                                </tr>
+                                <!--<tr>
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Instrument</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%" align="left">
+                                            <div style="position:relative; display:block;" id="showCustVoucherNo">
+                                                <input name="instrumentID" id="instrumentID" type="hidden" value="" />
+                                                <input class="FormSelectTypeInput" name="instrumentName" id="instrumentName" type="text"  autocomplete="off" value="Input Trading Code Here" onkeyup="customVoucherNo_suggest(this.value);" maxlength="100" onblur="if(this.value=='') { this.value='Input Trading Code Here';this.style.color='#888';$(this).css('font-style','oblique');} " onfocus="if(this.value=='Input Trading Code Here') {this.value=''; this.style.color='#000';$(this).css('font-style','normal')}" style="width:200px;this.style.color='#888';$(this).css('font-style','oblique'); text-transform:uppercase;" />
+                                                <div id='VoucherNoSuggestions' style='display:none; width:205px; height:205px;' class='ClassempIdSuggestions'>
+                                                    <div id='VoucherNoSuggestionsList' class=''>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </td>
+                                </tr>-->
+                                <tr>
+                                    <td colspan="4" align="center">
+                                    	<input class="FormRadioTypeInput" type="radio" name="cond" id="rate_m" value="y" />&nbsp;Rate Update only
+                                        <input class="FormRadioTypeInput" type="radio" name="cond" id="rate_all" value="all" checked="checked" />&nbsp;All&nbsp;
+                                    </td>
+                                </tr>
+                                 <tr>                                     
+                                     <td colspan="4" align="center"><input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='button' name='goBtn' id='goBtn' value='GO'/>
+                                        <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='reset' name='Reset' id='Reset' value='Reset' onclick="setReset();"/>
+                                        </td>
+                                 </tr>
+                            </table>
+                        </form>
+                </fieldset>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="left" style="padding-right:30px;">
+              <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+					<legend style='border:0px;'>Scrip Details</legend>
+                <div id="viewPTBStatement">
+                 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr id="noDataFound" valign="middle">
+                                <td width="100%" align="center" style="font-weight:bold; color:#F00;">No Information Found!</td>
+                            </tr>
+                            <tr>
+                                <td id="preloader" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg' style="font-weight:normal;margin-top:0px;">Please, wait while in process . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+                <div id="showMarginableScripHere" style="display:none;">
+                	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr>
+                                <td id="preloader1" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg1' style="font-weight:normal;margin-top:0px;">Please, wait while in process . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>                
+                </fieldset>
+            </td>
+        </tr>
+    </table>
+	<?php 
+	//echo $this->formCollection($form);
+	echo $this->form()->closeTag();
+	//echo $this->paginationControl($stockinformationedits,'sliding',array('partial/paginator.phtml', 'MarginableScripList'),array('route' => 'stockinformationedit'));
+	?>

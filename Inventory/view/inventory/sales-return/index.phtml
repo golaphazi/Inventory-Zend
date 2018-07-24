@@ -1,0 +1,932 @@
+<?php
+	$title = 'Sales Return';
+	$this->headTitle($title);
+	?>
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php 	
+	echo $this->escapeHtml($title);
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+	?></h1>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('salesreturn'));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+	?>
+     <table width="100%" border="0" cellspacing="1" cellpadding="10" style="font-family:Tahoma, Geneva, sans-serif;margin:0px auto 0px auto; font-size:85%;">
+        <tr valign="top">
+            <td align="left">
+             <script type="text/javascript">
+					$(document).ready(function() {
+						$("#ZONE_ID").focus();
+						$('#tranDateTo').datepicker({									
+							dateFormat : 'dd-mm-yy'
+						});
+						
+						$("#ZONE_ID").change(function(){                                    
+							//alert('asdfd');
+							if ($(this).val() == '') {
+								var options = '';
+								$("select#srID").html('');
+								options += '<option value="">--- please choose ---</option>';
+								$("select#srID").html(options);
+								return;
+							}
+							var url = '/salesreturn/getSRList?id=' + $(this).val();									
+							//$.post(url, function(data) {
+							$.getJSON(url, function(data) {
+								var options = '';
+								if(data.length>0) {
+									//alert(data);
+									options += '<option value="">--- please choose ---</option>';
+									for (var i = 0; i < data.length; i++) {
+										options += '<option value="' + data[i].EMPLOYEE_ID + '">' + data[i].EMPLOYEE_NAME + '</option>';
+									}							
+									$("select#srID").html('');
+									$("select#srID").html(options);
+								} else {
+									$("select#srID").html('');
+									options += '<option value="">--- please choose ---</option>';
+									$("select#srID").html(options);
+								}
+								return true;
+							});
+							var url = '/salesreturn/getRETList?id=' + $(this).val();									
+							//$.post(url, function(data) {
+							$.getJSON(url, function(data) {
+								var options = '';
+								if(data.length>0) {
+									//alert(data);
+									options += '<option value="">--- please choose ---</option>';
+									for (var i = 0; i < data.length; i++) {
+										options += '<option value="' + data[i].RETAILER_ID + '">' + data[i].NAME + '</option>';
+									}							
+									$("select#retID").html('');
+									$("select#retID").html(options);
+								} else {
+									$("select#retID").html('');
+									options += '<option value="">--- please choose ---</option>';
+									$("select#retID").html(options);
+								}
+								return true;
+							});
+							// End default template charge
+						});
+						
+						
+						$("#srID").change(function(){                                    
+							//alert('asdfd');
+							if ($(this).val() == '') {
+								var options = '';
+								$("select#retID").html('');
+								options += '<option value="">--- please choose ---</option>';
+								$("select#retID").html(options);
+								return;
+							}
+							var url = '/salesreturn/getSRWiseRETList?id=' + $(this).val();									
+							//$.post(url, function(data) {
+							$.getJSON(url, function(data) {
+								var options = '';
+								if(data.length>0) {
+									//alert(data);
+									options += '<option value="">--- please choose ---</option>';
+									for (var i = 0; i < data.length; i++) {
+										options += '<option value="' + data[i].RETAILER_ID + '">' + data[i].NAME + '(' +data[i].ZONESHORTNAME + ')' +' </option>';
+									}							
+									$("select#retID").html('');
+									$("select#retID").html(options);
+								} else {
+									$("select#retID").html('');
+									options += '<option value="">--- please choose ---</option>';
+									$("select#retID").html(options);
+								}
+								return true;
+							});
+						});
+						
+						//$.post('/salesreturn/getSupllierList',{}, function(j) {
+						$.getJSON('/salesreturn/getSupllierList',{}, function(j) {							
+							var options = '';
+							var actualSeq = 0;
+							if(j.length>0) {
+								//alert(j);
+								options += '<option value="">Select</option>';
+								for (var i = 0; i < j.length; i++) {
+									options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+								}
+								for (var k = 0; k < 10; k++) {
+									$("select#SUPPLIER_INFO_ID_"+k).html('');
+									$("select#SUPPLIER_INFO_ID_"+k).html(options);
+								}
+							} else {
+								$("select#SUPPLIER_INFO_ID_"+actualSeq).html('');
+								options += '<option value="" selected="selected">N/A</option>';
+								$("select#SUPPLIER_INFO_ID_"+actualSeq).html(options);
+							}									
+						})
+					});
+					function doValidationPaymentEntry() {
+						var formObject = document.salesreturn;
+						var numOfRows = $("#NumberOfRows").val();
+						if((document.getElementById('ZONE_ID').value =="")) {
+							alert("Please select Zone first!");
+							document.getElementById('ZONE_ID').focus();
+							return false;
+						}
+						if((document.getElementById('srID').value =="")) {
+							alert("Please select SR!");
+							document.getElementById('srID').focus();
+							return false;
+						}
+						if((document.getElementById('retID').value =="")) {
+							alert("Please select Retailer!");
+							document.getElementById('retID').focus();
+							return false;
+						}
+						for(var i = 1; i < numOfRows; i++ ) {
+							if(document.getElementById('CATEGORY'+i).value !="") {
+								if((document.getElementById('RQUANTITY'+i).value =="0")) {
+									alert("Please input returnable quantity!");
+									document.getElementById('RQUANTITY'+i).focus();
+									return false;
+								}/*if(document.getElementById('RATE'+i).value=="0.00") {
+									alert("Please enter rate!");
+									document.getElementById('RATE'+i).focus();
+									return false;
+								}*/
+							}
+						}
+						if(!confirm('Are you sure, you want to proceed?')){
+								return false;
+						}    
+						return true;
+					}
+					function cashDividendAIField(){
+						
+						if(document.getElementById('cashDividendChk').checked==true){
+							document.getElementById('cashDividend').disabled=false;
+							
+						}
+						if(document.getElementById('cashDividendChk').checked==false){
+							document.getElementById('cashDividend').disabled=true;
+							
+						}	
+					}
+					function BasedOnCBShow(v){
+						//$.getJSON("ajax/getCBCOACode.php",{'cbCode':v}, function(j){
+						$.getJSON('/salesreturn/getCBCOACode',{'cbCode':v},function(j){
+								//alert(j);
+								if(j.length>0)
+								{
+									var options = '';
+									options += '<option value="">Select COA-Code</option>';
+									for (var i = 0; i < j.length; i++) {
+									options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+									}
+									$("select#cbCOACode").html('');
+									$("select#cbCOACode").html(options);
+								}
+								else
+								{
+									options = '<option value="">Select COA-Code</option>';
+									$("select#cbCOACode").html('');
+									$("select#cbCOACode").html(options);
+								}
+							});
+						
+						if( v == 'cash'){
+							document.getElementById('showChqNo').style.display='none';
+							document.getElementById('showChqDate').style.display='none';
+							
+						}
+						if( v == 'bank'){
+							document.getElementById('showChqNo').style.display='';
+							document.getElementById('showChqDate').style.display='';
+							
+						}	
+					}
+					/*
+					function coa_code_suggest(inputString,no) 
+					{
+						//alert(inputString);
+						//alert(no);
+						if(inputString.length == 0)
+						{
+							$('#empIdSuggestions'+no).fadeOut();
+						} 
+						else 
+						{
+							$.post('/salesreturn/getSuggestRefCOAName',{queryString: inputString, no : no},
+							function(data)
+							{
+								//alert(data);
+								if(data.length >0) 
+								{
+									$('#suggestingEmpIdList'+no).html(data);
+									$('#empIdSuggestions'+no).fadeIn("slow");
+									
+								}
+							});
+						}
+					}
+					*/
+					function coa_code_suggest(inputString,no) {
+						$('#CATEGORYL'+no).html('');
+						var inputString = '';
+						
+							$.get('/retstockentry/getSuggestRefCOAName',{queryString: inputString, no : no},
+							function(data) {
+									$('#CATEGORYL'+no).html(data);
+									//alert(data);
+							});
+					}
+					function selectOption(event,id){
+						 var x = event.which || event.keyCode;
+						
+						 if(x == '39'){
+							 var textstring = $("#CATEGORY"+id).val();
+							 //alert(textstring);
+							 
+							$.post('/salesreturn/getSuggestRefCOAName',{queryString: textstring, no : id},
+							 function(dataa){
+								 if(dataa.length > 0){
+									 var myArray = $.trim(dataa); 
+									//alert(dataa);
+									 fill_id(myArray);
+									 var idf = id+1;
+									 if(idf >= 0 || idf <= 10){
+										 $("#RQUANTITY"+id).focus();
+									 }
+									 
+								 }else{
+									 $("#CATEGORY"+id).focus();
+									 $("#CATEGORY_ID"+id).val('');
+								 }
+							 })
+						 }else if(x == '37'){
+							  var idf = id-1;
+							  if(idf > 0 || idf <= 10){
+									$("#CATEGORY"+idf).focus();
+									$("#CATEGORY_ID"+idf).val('');
+							  }
+							  if(idf == 0){
+								  $("#retID").val('');
+								  $("#retID").focus();
+								  //alert();
+							  }
+							 
+						 }
+					}
+					function next(event,id,field){
+						//alert(field);
+						 var x = event.which || event.keyCode;
+						// alert(x);
+						 if(x == '39'){
+							 if(field == 1){
+								$("#DISCOUNT"+id).focus(); 
+							 }else if(field == 2){
+								 $("#DISCOUNT_RECEIVE"+id).focus(); 
+							 }else{
+								var idf = id+1;
+								$("#CATEGORY"+idf).focus(); 
+							 }
+							 
+						 }else if(x == '37'){
+							 if(field == 1){
+								$("#CATEGORY"+id).focus(); 
+							 }else if(field == 2){
+								 $("#RQUANTITY"+id).focus(); 
+							 }else if(field == 3){
+								 $("#DISCOUNT"+id).focus();
+								
+							 }else{
+								var idf = id+1;
+								$("#CATEGORY"+idf).focus(); 
+							 }
+						 }
+						
+					}
+					function fill_id(thisValue) {
+					   var coaCodeHeadName = thisValue;
+					   
+					   if(coaCodeHeadName == '') {
+							//document.getElementById('coa_code'+no).value = '';
+							document.getElementById('CATEGORY'+myArray[2]).value = '';
+							document.getElementById('CATEGORY_ID'+myArray[2]).value = '';
+							document.getElementById('RATE'+myArray[2]).value = '';
+							document.getElementById('CAT_PRICE_ID'+myArray[2]).value = '';
+							document.getElementById('QUANTITY'+myArray[2]).value = '';
+							document.getElementById('RQUANTITY'+myArray[2]).value = '';
+							document.getElementById('COA_CODE'+myArray[2]).value = '';
+							document.getElementById('COA_NAME'+myArray[2]).value = '';
+							return false;
+						}
+						var myArray = coaCodeHeadName.split(','); 
+						//document.getElementById('coa_codeshow'+no).innerHTML = myArray[0];
+						//document.getElementById('coa_code'+no).value = myArray[0];
+						document.getElementById('CATEGORY'+myArray[2]).value = myArray[1];
+						document.getElementById('CATEGORY_ID'+myArray[2]).value = myArray[0];
+						document.getElementById('RATE'+myArray[2]).value = myArray[3];
+						document.getElementById('CAT_PRICE_ID'+myArray[2]).value = myArray[4];
+						document.getElementById('QUANTITY'+myArray[2]).value = myArray[5];
+						document.getElementById('RQUANTITY'+myArray[2]).value = '';
+						document.getElementById('COA_CODE'+myArray[2]).value = myArray[6];
+						document.getElementById('COA_NAME'+myArray[2]).value = myArray[7];
+					/*
+					   if(coaCodeHeadName == '') {
+							//document.getElementById('coa_code'+no).value = '';
+							document.getElementById('CATEGORY'+no).value = '';
+							document.getElementById('CATEGORY_ID'+no).value = '';
+							document.getElementById('RATE'+no).value = '';
+							document.getElementById('CAT_PRICE_ID'+no).value = '';
+							document.getElementById('QUANTITY'+no).value = '';
+							document.getElementById('RQUANTITY'+no).value = '';
+							document.getElementById('COA_CODE'+no).value = '';
+							document.getElementById('COA_NAME'+no).value = '';
+							return false;
+						}
+						var myArray = coaCodeHeadName.split(','); 
+						//document.getElementById('coa_codeshow'+no).innerHTML = myArray[0];
+						//document.getElementById('coa_code'+no).value = myArray[0];
+						document.getElementById('CATEGORY'+no).value = myArray[1];
+						document.getElementById('CATEGORY_ID'+no).value = myArray[0];
+						document.getElementById('RATE'+no).value = sellPrice;
+						document.getElementById('CAT_PRICE_ID'+no).value = catPriceID;
+						document.getElementById('QUANTITY'+no).value = sumOfQuantity;
+						document.getElementById('RQUANTITY'+no).value = '';
+						document.getElementById('COA_CODE'+no).value = coaCode;
+						document.getElementById('COA_NAME'+no).value = coaName;
+					   $('#empIdSuggestions'+no).fadeOut();
+					   document.getElementById('RQUANTITY'+no).focus();
+					    //$.post("ajax/JournalDrCrSelect.php", {coaCode: myArray[0]}, 
+					    //$.post('/salesreturn/getJournalDrCrSelect',{coaCode: myArray[1]},	
+						//$.getJSON('/salesreturn/getJournalDrCrSelect',{coaCode: myArray[0]},
+						//function(data) {
+						//});
+					   */
+					}
+					/*function DrCrAmountAlign(e) {
+							
+						if(document.getElementById('COATypeD'+e).checked==true){	
+							document.getElementById('amount'+e).style.textAlign = 'left'
+							
+						}
+						
+						if(document.getElementById('COATypeC'+e).checked==true){
+							document.getElementById('amount'+e).style.textAlign = 'right'
+						}
+						return true;
+					}*/
+					function blankAllFields() {
+						for(var i = 1; i<= 10; i++) {
+							document.getElementById('CATEGORY'+i).value = '';
+							document.getElementById('CATEGORY_ID'+i).value = '';
+							//document.getElementById('coa_codeshow'+i).innerHTML = '';
+							//document.getElementById('coa_code'+i).value = '';
+							//document.getElementById('COATypeD'+i).disabled = false;
+							//document.getElementById('COATypeC'+i).disabled = false;
+							//document.getElementById('COATypeD'+i).checked = false;
+							//document.getElementById('COATypeC'+i).checked = false;
+							document.getElementById('NET_AMOUNT'+i).value = '0.00';
+							document.getElementById('NET_AMOUNT'+i).style.textAlign = 'right';
+								
+						}
+						//document.getElementById('particulars').value = '';
+						
+					}
+					
+					function AddTabRow() {
+						var numOfRows = $("#NumberOfRows").val();
+						var numOfRowsId = numOfRows - 1;
+																
+						if(document.getElementById('amount'+numOfRowsId).value=="0.00") {
+								return false;
+						} else {
+							// clone the last row in the table
+							var $tr = $("#ClosingBalTab").find("tbody tr:last").clone();
+							$tr.find("#CATEGORY"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onKeyup", function(){
+								return "coa_code_suggest(this.value,"+numOfRows+"); removeNumber(this);";
+							}).attr("value", function(){
+								return "";
+							});
+							
+							$tr.find("#empIdSuggestions"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							$tr.find("#suggestingEmpIdList"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							/*$tr.find("#coa_codeshow"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});*/
+							
+							$tr.find("#coa_code"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							
+							/*$tr.find("#COATypeD"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onClick", function(){
+								return "DrCrAmountAlign("+numOfRows+"); totalDRCRShow();";
+							}).attr("checked", function(){
+								return false;
+							});*/
+							
+							/*$tr.find("#COATypeC"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onClick", function(){
+								return "DrCrAmountAlign("+numOfRows+"); totalDRCRShow();";
+							}).attr("checked", function(){
+								return false;
+							});*/
+							
+							$tr.find("#NET_AMOUNT"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onBlur", function(){
+								return "numberFormat(\"NET_AMOUNT"+numOfRows+"\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; AddTabRow(); totalDRCRShow();";
+							}).attr("value", function(){
+								return "0.00";
+							});
+							
+							$("#ClosingBalTab").find("tbody tr:last").after($tr);
+							$("#coa_codeshow"+numOfRows).html('');
+							$("#NumberOfRows").attr("value",Number(numOfRows)+1);
+						}
+					}
+					
+					function totalDRCRShow() {
+						var numOfRows = $("#NumberOfRows").val();
+						var k=0;
+						var i=0;
+						var Totaldebit = 0;
+						var TotalAmount = 0.00;
+						var TotalQty = 0.00;
+						var TotalDiscount = 0.00;
+						var TotalDiscountReceive = 0.00;
+						for(i = 1; i < numOfRows; i++){
+							if((document.getElementById('RQUANTITY'+i).value !="0") || (document.getElementById('RATE'+i).value !="0.00")) {
+							  if((document.getElementById('TOTAL_AMOUNT'+i).value !="0.00") && (document.getElementById('NET_AMOUNT'+i).value !="")){
+								  var totalQty = document.getElementById('RQUANTITY'+i).value;
+								  var totalDiscount = document.getElementById('DISCOUNT'+i).value;
+								  var totalAmount = document.getElementById('TOTAL_AMOUNT'+i).value;
+								  var totalDiscountReceive = document.getElementById('DISCOUNT_RECEIVE'+i).value;
+								  var netAmount = document.getElementById('NET_AMOUNT'+i).value;
+								  
+								  totalQty     = totalQty.replace(/\,/g,"");
+								  totalQty     = Number(totalQty);
+								  TotalQty     = TotalQty + totalQty;
+								  
+								  totalAmount     = totalAmount.replace(/\,/g,"");
+								  totalAmount     = Number(totalAmount);
+								  TotalAmount      = TotalAmount + totalAmount;
+								  
+								  totalDiscount     = totalDiscount.replace(/\,/g,"");
+								  totalDiscount     = Number(totalDiscount);
+								  TotalDiscount     = TotalDiscount + totalDiscount;
+								  
+								  totalDiscountReceive     = totalDiscountReceive.replace(/\,/g,"");
+								  totalDiscountReceive     = Number(totalDiscountReceive);
+								  TotalDiscountReceive     = TotalDiscountReceive + totalDiscountReceive;
+								  
+								  netAmount     = netAmount.replace(/\,/g,"");
+								  netAmount     = Number(netAmount);
+								  Totaldebit      = Totaldebit + netAmount;
+							  }								
+							}
+						}
+						$("#QTYTOTAL").html(numberFormat('',TotalQty,2,',','.'));
+						$("#TOTALAMOUNT_HIDDEN").attr("value",numberFormat('',TotalAmount,2,',','.'));						
+						$("#TOTALAMOUNT").html(numberFormat('',TotalAmount,2,',','.'));
+						$("#TOTALDISCOUNT_HIDDEN").attr("value",numberFormat('',TotalDiscount,2,',','.'));
+						$("#TOTALDISCOUNT").html(numberFormat('',TotalDiscount,2,',','.'));
+						$("#TOTALDISCOUNTRECEIVE_HIDDEN").attr("value",numberFormat('',TotalDiscountReceive,2,',','.'));
+						$("#TOTALDISCOUNTRECEIVE").html(numberFormat('',TotalDiscountReceive,2,',','.'));
+						$("#NETTOTAL_HIDDEN").attr("value",numberFormat('',Totaldebit,2,',','.'));
+						$("#NETTOTAL").html(numberFormat('',Totaldebit,2,',','.'));
+					}
+					function pageReset() {
+						$('#viewBalanceSheet').fadeOut("slow");
+						$('#preloader').fadeIn("slow");
+						//$('#viewPTBStatement').fadeOut("slow");
+						$('#noDataFound').fadeIn('slow');
+					}
+					function calculateTotal(id,value,counter){
+						var total = 0.0000;
+						var discount = 0.0000;
+						var netTotal = 0.0000;
+						var avgRate = 0.0000;
+						var discountRec = 0.00;
+						if(id=='RQUANTITY'+counter){
+							var rate = $("#RATE"+counter).val().replace(/\,/g,"");
+							rate  = Number(rate);
+							total = Number(value * rate);
+							$("#TOTAL_AMOUNT"+counter).attr("value",total.toFixed(4));
+							$("#NET_AMOUNT"+counter).attr("value",total.toFixed(4));
+							totalDRCRShow();
+						} else if(id=='RATE'+counter){
+							//alert(value);
+							var quantity = $("#RQUANTITY"+counter).val().replace(/\,/g,"");
+							quantity = Number(quantity);
+							value = Number(value.replace(/\,/g,""));
+							total = Number(value * quantity);
+							$("#TOTAL_AMOUNT"+counter).attr("value",total.toFixed(4));
+							$("#NET_AMOUNT"+counter).attr("value",total.toFixed(4));
+							totalDRCRShow();
+						} else if(id=='DISCOUNT'+counter){
+							discount = $("#DISCOUNT"+counter).val().replace(/\,/g,"");
+							discount  = Number(discount);
+							total = $("#TOTAL_AMOUNT"+counter).val().replace(/\,/g,"");
+							total = Number(total);
+							netTotal = Number(total - discount);
+							$("#NET_AMOUNT"+counter).attr("value",netTotal.toFixed(4));
+							var quantity = $("#RQUANTITY"+counter).val().replace(/\,/g,"");
+							quantity = Number(quantity);
+							avgRate = Number(netTotal / quantity);
+							$("#AVG_RATE"+counter).attr("value",avgRate.toFixed(4));
+							totalDRCRShow();
+						} else if(id=='DISCOUNT_RECEIVE'+counter){
+							discount = $("#DISCOUNT"+counter).val().replace(/\,/g,"");
+							discount  = Number(discount);
+							discountRec = $("#DISCOUNT_RECEIVE"+counter).val().replace(/\,/g,"");
+							discountRec  = Number(discountRec);
+							total = $("#TOTAL_AMOUNT"+counter).val().replace(/\,/g,"");
+							total = Number(total) - Number(discount);
+							netTotal = Number(total + discountRec);
+							$("#NET_AMOUNT"+counter).attr("value",netTotal.toFixed(4));
+							var quantity = $("#RQUANTITY"+counter).val().replace(/\,/g,"");
+							quantity = Number(quantity);
+							avgRate = Number(netTotal / quantity);
+							$("#AVG_RATE"+counter).attr("value",avgRate.toFixed(4));
+							totalDRCRShow();
+						}		
+					}
+					function calculateDue(){
+						var netAmount = $('#NETTOTAL').html();
+						//alert(netAmount);
+						netAmount = netAmount.replace(/\,/g,"");
+						netAmount = Number(netAmount);
+						var netPayment = $("#NET_PAYMENT").val().replace(/\,/g,"");
+						var inTotalDiscount = $("#INTOTALDISCOUNT").val().replace(/\,/g,"");
+						//alert(inTotalDiscount);
+						netPayment = Number(netPayment);
+						var due = Number(netAmount - netPayment);
+						var due = Number(due - inTotalDiscount);
+						$("#DUE").attr("value",due.toFixed(4));
+						return true;
+					}
+					function checkDiscountType(type) {						
+						if(type == 'discountTypeIndv'){
+							//document.getElementById('INTOTALDISCOUNT'+no).value = '0.00';							
+							$("#INTOTALDISCOUNT").attr("value",0.00);
+							$('#INTOTALDISCOUNT').attr('readonly', true);
+							for(var i = 1; i<= 10; i++) {
+								//$("#DISCOUNT"+i).attr("value",0.00);
+								$('#DISCOUNT'+i).attr('readonly', false);
+							}
+						} else if(type == 'discountTypeTotal') {
+							$('#INTOTALDISCOUNT').attr('readonly', false);
+							for(var i = 1; i<= 10; i++) {
+								$("#DISCOUNT"+i).attr("value",0.00);
+								$('#DISCOUNT'+i).attr('readonly', true);
+							}
+						} else {
+						}
+					}
+					function getRetCOACode(retID,no) {
+						//$.post('/salesreturn/getRetCOACode',{retID: retID}, function(data) {
+						$.getJSON('/salesreturn/getRetCOACode',{retID: retID}, function(data) {
+							//alert(data);
+							if(data.length >0) 
+							{
+								for (var i = 0; i < data.length; i++) {
+									$('#RECEIVABLE_COA'+no).attr("value",data[i].receivableCoa);
+									$('#RECEIVABLE_COA_NAME'+no).attr("value",data[i].receivableCoaName);
+									$('#RET_SHORT_NAME'+no).attr("value",data[i].retShortName);
+								}
+								
+							} else {
+								$('#RECEIVABLE_COA'+no).attr("value",'');
+								$('#RECEIVABLE_COA_NAME'+no).attr("value",'');
+								$('#RET_SHORT_NAME'+no).attr("value",'');
+							}
+						});
+					}
+					function quantityValidation(value,no){
+						var availableQty = $("#QUANTITY"+no).val();
+						var returnQty = $("#RQUANTITY"+no).val();
+						var qtyMismatch = Number(availableQty) - Number(returnQty);
+						if(Number(returnQty) > Number(availableQty)){
+							alert("Return quantity can not be greater than available quantity!\nQuantity Mismatch " + qtyMismatch);
+							$("#RQUANTITY"+no).attr("value",0);
+							$("#RQUANTITY"+no).focus();
+							calculateTotal('RQUANTITY',value,no);
+							calculateDue();
+							return false;
+						}
+					}
+					
+					function getRetCOACode(retID,no) {
+						$('#preloaderQuery').fadeIn('slow');
+						//$.post('/retstockentry/getRetCurrentBalance',{retID: retID}, function(data) {
+						$.getJSON('/retstockentry/getRetCurrentBalance',{retID: retID}, function(data) {
+							//alert(data);
+							if(data.length >0) 
+							{
+								//alert(data);
+								for (var i = 0; i < data.length; i++) {
+									$('#RECEIVABLE_COA'+no).attr("value",data[i].receivableCoa);
+									$('#RECEIVABLE_COA_NAME'+no).attr("value",data[i].receivableCoaName);
+									$('#RET_SHORT_NAME'+no).attr("value",data[i].retShortName);									
+									document.getElementById('receivableFromRetailer').innerHTML = data[i].receivableAmount;
+									$('#showReceivableAmount').fadeIn("slow");
+									$('#preloaderQuery').fadeOut('slow');
+								}
+							} else {
+								$('#RECEIVABLE_COA'+no).attr("value",'');
+								$('#RECEIVABLE_COA_NAME'+no).attr("value",'');
+								$('#RET_SHORT_NAME'+no).attr("value",'');
+								$('#showReceivableAmount').fadeOut("slow");
+								document.getElementById('receivableFromRetailer').innerHTML = 0.00;
+								$('#preloaderQuery').fadeOut('slow');
+							}
+						});
+					}
+					function getSRCOACode(srID,no) {
+						$('#preloaderSRQuery').fadeIn('slow');
+						//$.post('/retstockentry/getSRCurrentBalance',{srID: srID}, function(data) {
+						$.getJSON('/retstockentry/getSRCurrentBalance',{srID: srID}, function(data) {
+							//alert(data);
+							if(data.length >0) 
+							{
+								//alert(data);
+								for (var i = 0; i < data.length; i++) {								
+									document.getElementById('receivableFromSR').innerHTML = data[i].receivableAmount;
+									$('#showSRReceivableAmount').fadeIn("slow");
+									$('#preloaderSRQuery').fadeOut('slow');
+								}
+							} else {
+								$('#showSRReceivableAmount').fadeOut("slow");
+								document.getElementById('receivableFromSR').innerHTML = 0.00;
+								$('#preloaderSRQuery').fadeOut('slow');
+							}
+						});
+					}
+                </script>
+               <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+					<legend style='border:0px;'>Select By</legend>
+                            <table border="0" cellpadding="5" cellspacing="0" width="100%" style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;">
+                                <tr>
+                                    <td width="45%" align="right">Zone:</td>
+                                    <td width="55%" align="left"><?php echo $this->formRow($form->get('ZONE_ID')); ?></td>
+                                </tr>
+                                <tr>
+                                    <td width="45%" align="right">Sales Represantative:</td>
+                                    <td width="55%" align="left"><?php echo $this->formRow($form->get('EMPLOYEE_ID')); ?>
+                                    <span id="preloaderSRQuery" style="display:none;"><img src="../img/preloader2.gif" style="width:40px;" /></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="45%" align="right">Retailer:</td>
+                                    <td width="55%" align="left">
+										<?php echo $this->formRow($form->get('RETAILER_ID')); ?>
+                                       <span id="preloaderQuery" style="display:none;"><img src="../img/preloader2.gif" style="width:40px;" /></span> 
+                                        <input name='RECEIVABLE_COA1' type='hidden'  id='RECEIVABLE_COA1' value='' />
+                                        <input name='RECEIVABLE_COA_NAME1' type='hidden'  id='RECEIVABLE_COA_NAME1' value='' />
+                                        <input name='RET_SHORT_NAME1' type='hidden'  id='RET_SHORT_NAME1' value='' />
+                                    </td>
+                                </tr>
+                                <tr id="showSRReceivableAmount" style="display:none;">
+                                    <td width="45%" align="right">Receivable from SR:</td>
+                                    <td width="55%" align="left">                                    
+                                        <span id="receivableFromSR">0.00</span> BDT.
+                                    </td>
+                                </tr>
+                                
+								<tr id="showReceivableAmount" style="display:none;">
+                                    <td width="45%" align="right">Receivable from Retailer:</td>
+                                    <td width="55%" align="left">                                    
+                                        <span id="receivableFromRetailer">0.00</span> BDT.
+                                    </td>
+                                </tr>   
+                            </table>
+                </fieldset>
+            </td>
+        </tr>
+        <tr valign="top" >
+            <td align="center">
+            	<fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+				<legend style='border:0px;cursor:pointer;' onClick="return ShowHide('viewcomp_minorest')">Stock Distribution</legend>
+                       <table id="ClosingBalTab" border="0" width="100%" align="center" cellspacing="1" cellpadding="3" style="font-size:75%;font-family:Tahoma, Geneva, sans-serif;">
+                           <?php 
+						   	$tableTR = '';
+							/*$tableTR .='<tr valign="middle" style="font-weight:normal; text-align:center; background:#E8E1E1; height:50px;">
+											<td colspan="7" align="left" style="padding-right:10px;font-size:150%;">Discount Type: <input id="discountTypeIndv" type="radio" value="individual" name="DISCOUNT_TYPE" checked="checked" onclick="checkDiscountType(this.id);">&nbsp;Individual Discount&nbsp;<input id="discountTypeTotal" type="radio" value="intotal" name="DISCOUNT_TYPE" onclick="checkDiscountType(this.id);">&nbsp;Intotal Discount&nbsp;</td>
+										</tr>';*/
+							$tableTR .='<tr valign="top" style="font-weight:bold; text-align:center; background:#E8E1E1;">
+											<td width="20%" align="center" style="padding-right:10px;">MODEL</td>
+											<td width="5%" align="right" style="padding-right:10px;">AVAILABLE QTY</td>
+											<td width="5%" align="right" style="padding-right:10px;">RETURN QTY</td>
+											<td width="10%" align="right" style="padding-right:10px;">RATE</td>
+											<td width="15%" align="center" style="padding-right:10px;">TOTAL</td>
+											<td width="5%" align="right" style="padding-right:10px;">DIS. PAID</td>
+											<td width="5%" align="right" style="padding-right:10px;">DIS. REC.</td>
+											<td width="10%" align="right" style="padding-right:10px;">AVG PRICE</td>
+											<!--<td width="10%" align="center" style="padding-right:10px;">REMARKS</td> -->
+											<td width="15%" align="right" style="padding-right:10px;">NET TOTAL</td>											
+										</tr>';
+							$class = 'evenRow';
+							for($i=1; $i<=10; $i++){
+							if($class == 'evenRow') {
+								$class = 'oddRow';
+							} else {
+								$class = 'evenRow';
+							}
+							$j = $i-1;
+							$tableTR .="<tr valign='top' class='".$class."'>
+											<td  align='left' class=''>
+												 <div style='position:relative;'>
+													<input name='CATEGORY{$i}' type='text' list='CATEGORYL{$i}' id='CATEGORY{$i}'  style='width:120px;font-family:Tahoma, Geneva, sans-serif;' value='' autocomplete='off' onkeypress='selectOption(event,{$i})' onfocus='coa_code_suggest(this.value,{$i});' onclick='if($(\"#srID\").val()==\"\"){ alert(\"Please select SR!\");  $(\"#srID\").focus();}'/>
+													<input name='CATEGORY_ID{$i}' type='hidden'  id='CATEGORY_ID{$i}' value='' />
+													<input name='COA_CODE{$i}' type='hidden'  id='COA_CODE{$i}' value='' />
+													<input name='COA_NAME{$i}' type='hidden'  id='COA_NAME{$i}' value='' />
+													<div id='empIdSuggestions{$i}' style='display:none;width:120px; height:250px;' class='ClassempIdSuggestions'>
+														<div id='suggestingEmpIdList{$i}' class='ClasssuggestingEmpIdList'>
+														</div>
+													</div>
+													<datalist id='CATEGORYL{$i}'>
+									
+													</datalist>
+												</div>
+											</td>
+											<td  align='left'>
+												 <input type='text' name='QUANTITY{$i}' id='QUANTITY{$i}' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:50px;' onfocus='if(this.value==\"0\") this.value=\"\";' onblur='numberFormat(\"QUANTITY{$i}\",this.value,0,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0\";calculateTotal(this.id,this.value,{$i}); calculateDue();' value=\"0\" maxlength='10' autocomplete='off' readonly='readonly'/>
+											</td>
+											<td  align='left'>
+												 <input type='text' name='RQUANTITY{$i}' id='RQUANTITY{$i}' onkeypress='next(event,{$i},1)' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:50px;' onfocus='if(this.value==\"0\") this.value=\"\";' onblur='numberFormat(\"RQUANTITY{$i}\",this.value,0,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0\";calculateTotal(this.id,this.value,{$i});calculateDue(); quantityValidation(this.value,{$i});' value=\"0\" maxlength='10' autocomplete='off'/>
+											</td>
+											<td  align='left' class='FormSelectTypeInput'>
+												 <input type='hidden' name='CAT_PRICE_ID{$i}' id='CAT_PRICE_ID{$i}' value=''/>
+												 <input type='text' name='BUY_PRICE{$i}' id='RATE{$i}' onkeyup='removeChar(this);calculateTotal(this.id,this.value,{$i});' class='FormNumericTypeInput' style='width:80px;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"RATE{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\";calculateTotal(this.id,this.value,{$i});' value=\"0.00\" maxlength='10' autocomplete='off' readonly='readonly'/>
+											</td>
+											<td align='right' class='FormSelectTypeInput'>
+												 <input align='right' type='text' name='TOTAL_AMOUNT{$i}' id='TOTAL_AMOUNT{$i}' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:120px; text-align:right;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"TOTAL_AMOUNT{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; ' value=\"0.00\" maxlength='15' readonly='readonly' autocomplete='off'/>
+											</td>
+											<td  align='left' class='FormSelectTypeInput'>
+												 <input type='text' name='DISCOUNT{$i}' id='DISCOUNT{$i}' onkeypress='next(event,{$i},2)' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:40px;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"DISCOUNT{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; calculateTotal(this.id,this.value,{$i}); calculateDue(); ' value=\"0.00\" maxlength='10' autocomplete='off'/>
+											</td>
+											<td  align='left' class='FormSelectTypeInput'>
+												 <input type='text' name='DISCOUNT_RECEIVE{$i}' onkeypress='next(event,{$i},3)' id='DISCOUNT_RECEIVE{$i}' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:40px;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"DISCOUNT_RECEIVE{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; calculateTotal(this.id,this.value,{$i}); calculateDue(); ' value=\"0.00\" maxlength='10' autocomplete='off'/>
+											</td>
+											<td  align='left' class='FormSelectTypeInput'>
+												 <input type='text' name='AVG_RATE{$i}' id='AVG_RATE{$i}' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:80px;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"AVG_RATE{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; ' value=\"0.00\" maxlength='10' readonly='readonly' autocomplete='off'/>
+											</td>
+											<!--<td  align='left'>
+												 <input type='text' name='REMARKS{$i}' id='REMARKS{$i}' class='FormTextTypeInput' style='width:100px;' value='' maxlength='500' autocomplete='off' placeholder = 'input remarks if required'/>
+											</td>-->
+											<!--<td  align='center' class=''><div id='coa_codeshow{$i}'></div><input type='hidden' readonly='readonly' style='background-color:#999' name='coa_code{$i}' id='coa_code{$i}' size='20'/></td>
+											<td  align='center' class=''><input type='radio' onclick='DrCrAmountAlign($i); totalDRCRShow();' name='COAType{$i}' id='COATypeD{$i}' value='D'  />  Dr <input type='radio' onclick='DrCrAmountAlign($i); totalDRCRShow();' name='COAType{$i}' id='COATypeC{$i}' value='C'  />  Cr</td>-->
+											<td  align='right' class=''><input type='text' name='NET_AMOUNT{$i}' id='NET_AMOUNT{$i}' onkeyup='removeChar(this);' class='FormNumericTypeInput' style='width:100px;' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"amount{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; AddTabRow(); totalDRCRShow();' value=\"0.00\" maxlength='15' readonly='readonly' autocomplete='off'/></td>
+										</tr>";		
+							}
+							echo $tableTR;
+						   ?>
+                            <tr valign='top' style="font-weight:bold;">
+                                <td align='center' class=''>&nbsp;</td>
+                                <td align='right' width="10%" style="padding-right:10px;">-</td>
+                                <td align='right' width="5%" style="padding-right:5px;"><span id="QTYTOTAL">0.00</span></td>
+                                <td align='right' width="5%" style="padding-right:10px;">-</td>
+                                <td align='right' width="15%" style="padding-right:5px;">
+                                	<input type="hidden" name="TOTALAMOUNT_HIDDEN" id="TOTALAMOUNT_HIDDEN" value="0.00"/>
+                                    <span id="TOTALAMOUNT">0.00</span>
+                                </td>
+                                <td align='right' width="5%" style="padding-right:5px;">
+                                	<input type="hidden" name="DISCOUNT_COACODE" id="DISCOUNT_COACODE" value="601001001"/>
+                                    <input type="hidden" name="DISCOUNT_COANAME" id="DISCOUNT_COANAME" value="DISCOUNT"/>
+                                    <input type="hidden" name="DISCOUNT_COACODE" id="DISCOUNT_COACODE" value="503001001"/>
+                                    <input type="hidden" name="DISCOUNT_COANAME" id="DISCOUNT_COANAME" value="DISCOUNT RECEIVE"/>
+                                    <input type="hidden" name="GAINLOSS_COACODE" id="GAINLOSS_COACODE" value="502002001"/>
+                                    <input type="hidden" name="GAINLOSS_COANAME" id="GAINLOSS_COANAME" value="Capital Gain/(loss)"/>
+                                    
+                                	<input type="hidden" name="TOTALDISCOUNT_HIDDEN" id="TOTALDISCOUNT_HIDDEN" value="0.00"/>
+                                    <input type="hidden" name="TOTALDISCOUNTRECEIVE_HIDDEN" id="TOTALDISCOUNTRECEIVE_HIDDEN" value="0.00"/>
+                                	<span id="TOTALDISCOUNT">0.00</span>
+                                </td>
+                                <td align='right' width="5%" style="padding-right:10px;"><span id="TOTALDISCOUNTRECEIVE">0.00</span></td>
+                                <td align='right' width="5%" style="padding-right:10px;">-</td>
+                               <!-- <td align='right' width="5%" style="padding-right:10px;">-</td> -->
+                                <td align='right' width="15%" style="padding-right:10px;">
+                                	<input type="hidden" name="NETTOTAL_HIDDEN" id="NETTOTAL_HIDDEN" value="0.00"/>
+                                    <span id="NETTOTAL">0.00</span>
+                                </td>
+                            </tr>
+                            <tr valign='top' style="font-weight:bold;">
+                                <td colspan='8'  align='right' class=''>Net Receive</td>
+                                <td align='right' style="padding-right:10px;"><input type="text" name="NET_PAYMENT" id="NET_PAYMENT" onkeyup="removeChar(this);" class="FormNumericTypeInput" style="width:100px;" onfocus="if(this.value=='0.00') this.value='';" onblur="numberFormat('NET_PAYMENT',this.value,2,',','.'); if((this.value=='') || (this.value==0)) this.value=0.00;calculateDue();" value="0.00" maxlength="20" autocomplete="off"/></td>
+                            </tr>
+                            <tr valign='top' style="font-weight:bold;">
+                                <td colspan='8'  align='right' class=''>In Total Discount</td>
+                                <td align='right' style="padding-right:10px;"><input type="text" name="INTOTALDISCOUNT" id="INTOTALDISCOUNT" onkeyup="removeChar(this);" class="FormNumericTypeInput" style="width:100px;" onfocus="if(this.value=='0.00') this.value='';" onblur="numberFormat('INTOTALDISCOUNT',this.value,2,',','.'); if((this.value=='') || (this.value==0)) this.value=0.00;calculateDue();" value="0.00" maxlength="20" autocomplete="off"/></td>
+                            </tr>
+                            <tr valign='top' style="font-weight:bold;">
+                                <td colspan='8'  align='right' class=''>Receivable Amount</td>
+                                <td align='right' style="padding-right:10px;"><input type="text" name="DUE" id="DUE" onkeyup="removeChar(this);" class="FormNumericTypeInput" style="width:100px;" onfocus="if(this.value=='0.00') this.value='';" onblur="numberFormat('DUE',this.value,2,',','.'); if((this.value=='') || (this.value==0)) this.value=0.00;" value="0.00" maxlength="20" autocomplete="off" readonly="readonly"/></td>
+                            </tr>
+                            <tr valign="top">
+                                 <td align="center" colspan="9">&nbsp;</td>
+                            </tr>
+                            <tr valign="top">
+                                 <td align="center" colspan="9">&nbsp;</td>
+                            </tr>
+                            <tr valign="top">
+                                 <td align="center" colspan="9">
+                                 <input type="hidden" name="NumberOfRows" id="NumberOfRows" value="<?php echo $i; ?>"/>
+                                 <?php echo $this->formRow($form->get('ORDER_NO')); ?>
+                                 <input style="font-family:Tahoma, Geneva, sans-serif; font-size:120%;" type="submit" name="insertJournal" id="insertJournal" value="Submit" />
+                                 <input style="font-family:Tahoma, Geneva, sans-serif; font-size:120%;" type="reset" name="reset" id="reset" value="Reset" /></td>
+                            </tr>
+                       </table>
+                </fieldset>
+            </td>
+  		</tr>
+    </table>
+	<?php 
+	//echo $this->formCollection($form);
+	echo $this->form()->closeTag();
+	?>
+
+<script>	
+$('form#salesreturn input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					var ZONE_ID = $("#ZONE_ID").val();
+					var srID = $("#srID").val();
+					var retID = $("#retID").val();
+					if(ZONE_ID != '' && srID != '' && retID != ''){
+						$("#CATEGORY1").focus();
+					}
+				}
+				e.preventDefault();
+				return false;
+				
+			}
+		});
+	
+</script>

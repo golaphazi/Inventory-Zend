@@ -1,0 +1,232 @@
+<?php
+	$title = 'Purchase Entry Edit';
+	$this->headTitle($title);
+	?> 
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($title);?></h1>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('purchaseentryedit'));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+	?>
+     <table width="95%" border="0" cellspacing="1" cellpadding="10" style="font-family:Tahoma, Geneva, sans-serif;margin:0px auto 0px auto; font-size:85%;">
+        <tr valign="top">
+            <td align="left">
+             <script type="text/javascript">
+					$(document).ready(function() {
+						$("#catIdd").focus();
+						$('#tranDateFrom').datepicker({									
+							dateFormat : 'dd-m-yy'
+						});
+						$('#tranDateTo').datepicker({									
+							dateFormat : 'dd-m-yy'
+						});
+						$("#goBtn").click(function() {
+								var SUPPLIER_ID = '';
+								var RETAILER_ID = '';
+								var invoiceType = $('input[name=invoiceType]:radio:checked').val();
+								if(invoiceType == 'purchase') {
+									SUPPLIER_ID  	= $("#SUPPLIER_ID").val();
+								} else if(invoiceType == 'sale') {
+									RETAILER_ID  	= $("#retID").val();
+								}
+								var tranDateFrom  	= $("#tranDateFrom").val();
+								var tranDateTo  	= $("#tranDateTo").val();
+								var parentTableID	= $("#parentTableID").val();
+								var orderNo			= $("#ORDER_NO").val();
+								var printView 		= 'view';
+								$('#preloader').fadeIn('slow');
+								$.post('/purchaseentryedit/getInvoiceDetails',{'invoiceType': invoiceType,'printView':printView,'tranDateFrom':tranDateFrom,'tranDateTo':tranDateTo,'orderNo':orderNo,'SUPPLIER_ID':SUPPLIER_ID,'RETAILER_ID':RETAILER_ID,'parentTableID': parentTableID}, function(data) {
+								//$.getJSON('/purchaseentryedit/getInvoiceDetails',{'invoiceType': invoiceType,'printView':printView,'tranDateFrom':tranDateFrom,'tranDateTo':tranDateTo,'orderNo':orderNo,'SUPPLIER_ID':SUPPLIER_ID,'RETAILER_ID':RETAILER_ID,'parentTableID': parentTableID}, function(data) {
+									//alert(data);
+								if(data.length > 0)  {
+									//alert(data);
+									$('#noDataFound').fadeOut('slow');
+									//$('#preloader').fadeIn('slow');
+									$('#showMarginableScripHere').fadeIn('slow');
+									$('#showMarginableScripHere').html(data);
+									$('#showMarginableScripHere').fadeIn("slow");
+									$('#preloader').fadeOut('slow');
+								} else  {
+									$('#noDataFound').fadeOut('slow');
+									$('#preloader').fadeIn('slow');	
+								}	
+							});
+						});
+					});
+					
+					function checkCalender(thisDate,businessDate){
+						var fromDate = String($("#tranDateFrom").val());
+						var toDate = String($("#tranDateTo").val());
+						if((fromDate != '') && (toDate != '')){							
+							var tempFromDate = fromDate.split('-'); 
+							var tempToDate = toDate.split('-');							
+							var a = tempFromDate[1]+'/'+tempFromDate[0]+'/'+tempFromDate[2];
+							var b = tempToDate[1]+'/'+tempToDate[0]+'/'+tempToDate[2];													
+							if((dates.compare(b,a) == 1) || (dates.compare(b,a) == 0)) {
+								return true;
+							} else {
+								alert('Invalid Date Range!');
+								$("#tranDateFrom").attr("value",businessDate);
+								$("#tranDateTo").attr("value",businessDate);
+								return false;
+							}
+						}
+					}
+					
+					function coa_code_suggest(inputString) 
+					{
+						var invoiceType = $('input[name=invoiceType]:radio:checked').val();
+						if(inputString.length == 0)
+						{
+							$('#empIdSuggestions'+no).fadeOut();
+						} 
+						else 
+						{
+							$.post('/purchaseentryedit/getSuggestRefCOAName',{queryString: inputString, 'invoiceType': invoiceType,},
+							function(data)
+							{
+								//alert(data);
+								if(data.length >0) 
+								{
+									$('#suggestingEmpIdList').html(data);
+									$('#empIdSuggestions').fadeIn("slow");
+									
+								}
+							});
+						}
+					}
+					
+					function fill_id(thisValue) {
+					   var coaCodeHeadName = thisValue;
+					   if(coaCodeHeadName == '') {
+							document.getElementById('parentTableID').value = '';
+							document.getElementById('ORDER_NO').value = '';
+							return false;
+						}
+						var myArray = coaCodeHeadName.split(','); 
+						document.getElementById('parentTableID').value = myArray[0];
+						document.getElementById('ORDER_NO').value = myArray[1];
+					   $('#empIdSuggestions').fadeOut();
+					}
+					function showDateCond(id){
+						if(id == 'supplierList'){
+							$('#retailerList').fadeOut();
+							$('#supplierList').fadeIn();
+						} else if (id == 'retailerList'){
+							$('#supplierList').fadeOut();
+							$('#retailerList').fadeIn();
+						}
+					}
+					
+                </script>
+                 <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+					<legend style='border:0px;'>Search By</legend>
+                        <form name="InvestorCurrentUnitHoldingForm" method="post" action="IncomeStatement.php">
+                            <table border="0" cellpadding="3" cellspacing="0" width="100%">                              
+                                <tr>
+                                     <td width="23%">&nbsp;</td>
+                                     <td width="17%">Purchase Type</td>
+                                     <td width="1%">: </td>
+                                     <td width="59%">
+										<input type='radio' name='invoiceType' id='invoiceType_p' value='purchase' checked="checked" onclick="showDateCond('supplierList');"/>&nbsp;Purchase
+                                        <input type='radio' name='invoiceType' id='invoiceType_s' value='sale' onclick="showDateCond('retailerList');" disabled="disabled"/>&nbsp;Sale
+                                     </td>
+                                </tr>
+                                <tr id="supplierList">
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Supplier</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%">
+										<?php echo $this->formRow($form->get('SUPPLIER_ID')); ?>
+                                    </td>
+                                </tr>
+                                <tr id="retailerList" style="display:none;">
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Retailer</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%">
+										<?php echo $this->formRow($form->get('RETAILER_ID')); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="23%">&nbsp;</td>
+                                    <td width="17%">Invoice No</td>
+                                    <td width="1%">: </td>
+                                    <td width="59%">
+										<div style='position:relative;'>
+                                            <input name='ORDER_NO' type='text'  id='ORDER_NO'  style='width:150px;font-family:Tahoma, Geneva, sans-serif;' value='' autocomplete='off' onkeyup='coa_code_suggest(this.value);'/>
+                                            <input name='parentTableID' type='hidden'  id='parentTableID' value='' />
+                                           <div id='empIdSuggestions' style='display:none;width:150px; height:250px;' class='ClassempIdSuggestions'>
+                                                <div id='suggestingEmpIdList' class='ClasssuggestingEmpIdList'>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                     From</td>
+                                    <td> : </td>
+                                    <td>
+                                    <?php echo $this->formRow($form->get('tranDateFrom')); ?> &nbsp;&nbsp;
+                                    To&nbsp;
+                                    <?php echo $this->formRow($form->get('tranDateTo')); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>
+										<input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='button' name='goBtn' id='goBtn' value='GO'/>
+                                        <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='reset' name='Reset' id='Reset' value='Reset'/>
+                                     </td>
+                                 </tr>
+                            </table>
+                        </form>
+                </fieldset>
+               
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="left" style="padding-right:30px;">
+             <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+				<legend style='border:0px;'>Stock Report</legend>
+                <div id="viewPTBStatement">
+                 	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr id="noDataFound" valign="middle">
+                                <td width="100%" align="center" style="font-weight:bold; color:#F00;">No Information Found!</td>
+                            </tr>
+                            <tr>
+                                <td id="preloader" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg' style="font-weight:normal;margin-top:0px;">Please, wait while in process . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+                <div id="showMarginableScripHere" style="display:none;">
+                	<table border="0" cellpadding="3" cellspacing="0" width="100%">
+                            <tr>
+                                <td id="preloader1" style='height:100px; padding:0px; text-align:center; display:none;'>
+                                    <h4 id='msg1' style="font-weight:normal;margin-top:0px;">Please, wait while in process . . .</h4>
+                                    <span>
+                                        <img src="../img/preloader2.gif" style="width:40px;" />
+                                    </span>
+                                </td>
+                            </tr>
+                    </table>
+                </div>
+                </fieldset>
+            </td>
+        </tr>
+    </table>
+	<?php 
+	//echo $this->formCollection($form);
+	echo $this->form()->closeTag();
+	?>
