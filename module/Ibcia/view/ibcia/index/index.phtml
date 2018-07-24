@@ -1,0 +1,55 @@
+<?php
+	use Zend\Session\Container as SessionContainer; 
+	$this->session 	= new SessionContainer('post_supply');
+?>
+<div class="" style="width:100%; vertical-align:top;" align="center">
+<table border="0" cellpadding="2" cellspacing="2" align="center" class="" style="width:95%;font-family:Tahoma;margin:0px auto 0px auto;font-size:100%;">
+    <tr valign="top">
+        <td align="center" width="33%" valign="top">
+        	<fieldset style="width:95%;border:1px;border-top:1px solid #CCC; border-right:1px solid #CCC;">
+					<legend style="border:0px; font-weight:normal;font-style:italic; letter-spacing:1px;">Welcome <a title="Change your password" href="<?php echo $this->url('user',array('action'=>'editPassword', 'id' => $this->session->userid));?>"><?php echo $userName; ?></a></legend>
+                    	 <div style="vertical-align:middle; text-align:left; font-style:normal; font-size:90%;">
+						 <?php
+						   echo sprintf($this->translate('Welcome to IBIZCARE Inventory Accounts Application, <br/>Business Date: '.$businessDate.', <br/>You have logged in as ' .$rolename  ), '<span class="">', '</span>')
+						 ?>
+                         </div>
+            </fieldset><br/>
+            <fieldset style="width:95%;border:1px;border-top:1px solid #CCC;border-right:1px solid #CCC;">
+                <legend style="border:0px;font-weight:normal;font-style:italic;letter-spacing:1px;"><img src="../img/index.jpg" width="50" height="25" border="0" style="padding:10px 0px 5px 0px;" />&nbsp;Your Ad Here</legend>										
+                     <div style="vertical-align:middle; text-align:center;">
+                     <img src="../img/inventory_add1.png" align="middle" onmouseout="" onmouseover="" height="50" width="150" style="vertical-align:middle;" title="IBIZCARE Financial Planning" />
+					 <?php 
+                       //echo $corporateAction;
+                     ?>
+                     </div>
+            </fieldset>
+        </td>
+        <td align="center" width="34%" valign="middle">&nbsp;
+        	<img src="../img/front_logo.png" align="middle" onmouseout="" onmouseover="" height="180" width="350" style="vertical-align:middle;" title="IBIZCARE Financial Planning" />
+        </td>
+        <td align="left" width="33%" valign="top">
+        	<fieldset style="width:95%;border:1px;border-top:1px solid #CCC;border-left:1px solid #CCC;">
+                <legend id="showHideLegend" style="border:0px;font-weight:normal;font-style:italic;letter-spacing:1px;"><img src="../img/cancel.png" align="middle" onmouseout="" onmouseover="" height="" width="" style="vertical-align:middle;" title="Show/Hide" onclick="ShowHideExtended('showHideIcon','showHideLegend');" /></legend>
+            <spna id="showHideIcon">    
+            <img src="../img/tell_a_frined.png" align="middle" width="80" height="40" border="0" style="padding:10px 0px 5px 0px;" title="Tell a Frined" />&nbsp;<a onclick="Popup=window.open('../tellafriend/add?','Popup','width=600,height=600,left=280,top=80,toolbar=no,scroll=yes')" title="Tell A Friend" href="javascript:void(0);">Tell A Friend</a>&nbsp;&nbsp;<img src="../img/call_a_meeting.png" align="middle" width="54" height="30" border="0" style="padding:7px 0px 5px 0px;" title="Book a meeting" />&nbsp;&nbsp;<a href="#" rel="lightbox" title="Book a meeting">Book a Meeting</a>&nbsp;&nbsp;<img src="../img/request_quote.jpg" align="middle" width="80" height="40" border="0" style="padding:10px 0px 5px 0px;" title="Request" />&nbsp;<a href="#" rel="lightbox" title="Request">Request</a>&nbsp;&nbsp;<img src="../img/document_icon.png" align="middle" width="60" height="40" border="0" style="padding:0px 0px 5px 15px;" title="User's Manual" />&nbsp;<a title="User's Manual" href="../uploaddir/document/ibcia_screenshot.pdf" target="_new">User's Manual</a></span>
+            </fieldset>
+        <br/>
+        <fieldset style="width:95%;border:1px;border-top:1px solid #CCC;border-left:1px solid #CCC;">
+            <legend style="border:0px;font-weight:normal;font-style:italic;letter-spacing:1px;">&nbsp;User's Notification</legend>	
+            <div style="vertical-align:middle; text-align:left; font-style:normal; font-size:90%;">
+                     <a onclick="" href="javascript:void(0);"><marquee behavior="right" onmouseout="this.start();" onmouseover="this.stop();" style="font-family:tahoma;color:green;font-style:italic;cursor:pointer;">Intelligent Business Care</marquee></a>
+            </div>
+        </fieldset>
+        </td>
+    </tr><!--
+    <tr valign="top">
+        <td align="center" width="50%">&nbsp;
+        Margin Call
+        </td>
+        <td align="center" width="50%">&nbsp;
+        Status
+        </td>
+    </tr>-->
+</table>
+</div>
+

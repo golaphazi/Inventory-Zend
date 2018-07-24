@@ -1,0 +1,243 @@
+<?php
+//filename : module/Ibcia/view/ibcia/eod/eod-backup.phtml
+$title = 'Market Price Import: '.$this->businessdate;
+$this->headTitle($title);
+?>
+
+<div class='wrap-security'>
+	<div class="banner">
+		<img src="../img/logo.png" alt="Organization banner" width="288" height="72" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('style','width:1000px; height:350px; left:28%;');
+			$form->setAttribute('action', $this->url('businessdate'));
+			$form->prepare();
+			 
+			echo $this->form()->openTag($form);
+		?>
+			<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+			
+            <div style="height:280px; overflow:auto">
+            <table class="market-price" cellpadding='3' cellspacing='1' border='0' width='100%' style='font-family:Arial, Helvetica, sans-serif; margin:0px auto 0px auto; font-size:70%;'>
+            	<thead>
+                	<tr>
+                    	<td colspan="10">&nbsp;</td>
+                    </tr>
+                </thead>
+                <tbody>
+			<?php
+					$marketPriceDisplay	= '';
+					$mkreportname		= '';
+					$businessDateError	= 0;
+					if($this->MARKET_HEAD_MISSMATCH == 1) {
+						if(sizeof($this->lScripInfo) > 0){
+							$dbScripId 		= $this->lScripInfo['INSTRUMENT_DETAILS_ID'];
+							$dbScripSymbol 	= $this->lScripInfo['SYMBOL'];
+							
+							//public trade information desk
+							$pubScripName 	= array();
+							$pubOpenPrice 	= array();
+							$pubHighPrice 	= array();
+							$pubLowPrice 	= array();
+							$pubClosePrice 	= array();
+							$pubChange 		= array();
+							$pubTrade 		= array();
+							$pubVolume 		= array();
+							$pubValueInMn 	= array();
+							
+							if($this->fileContents) {
+								$marketPriceDisplay	.= "
+									<tr style='font-weight:bold;height:40px;background:#e8e1e1;'>
+										<td colspan='9' valign='bottom'>PRICES IN PUBLIC TRANSACTIONS</td>
+										<td valign='bottom' style='text-align:right;'>
+											<a href='csv_report/dse_public_tran_{".$mkreportname."}.csv' target='_blank'><img src='images/csv_icon.gif' width='24' title='Export as CSV' alt='Export as CSV' border='0' style='padding:0px 0px 5px 0px;' /></a>
+										</td>
+									</tr>
+									<tr style='font-weight:bold; height:30px; text-align:right; background:#eee9e9;'>
+										<td>Sl No.</td>
+										<td style='text-align:left;'>Scrip</td>
+										<td>Open</td>
+										<td>High</td>
+										<td>Low</td>
+										<td>Close</td>
+										<td>Change(%)</td>
+										<td>Trade</td>
+										<td>Volume</td>
+										<td>Value(Mn)</td>
+									</tr>
+								";
+								
+								$count 				= 1;
+								$businessDateError	= 0;
+								$errorLine			= 0;
+								$errorType			= '';
+								while (($data = fgetcsv($this->fileContents, 1000, ",")) !== FALSE) {
+									list($mktInfoDate,$symbol,$open,$high,$low,$close,$change,$trade,$volume,$valueInMn) = $data;
+									//echo "<pre>"; print_r($symbol); 
+									//die();
+									//echo $mktInfoDate."$$".$this->businessdate;
+									
+									if($mktInfoDate) {
+										if($mktInfoDate == $this->businessdate) {
+											$fileFormateCheck = true;
+											if(in_array(strtoupper($symbol),$dbScripSymbol)) {
+												if(
+													(is_numeric($open)) && 
+													(is_numeric($high)) &&
+													(is_numeric($low)) &&
+													(is_numeric($close)) &&
+													(is_numeric($change)) &&
+													(is_numeric($trade)) &&
+													(is_numeric($volume)) &&
+													(is_numeric($valueInMn))
+													) {
+													$pubScripName[] 	= $symbol;
+													$pubOpenPrice[] 	= $open;
+													$pubHighPrice[] 	= $high;
+													$pubLowPrice[]		= $low;
+													$pubClosePrice[] 	= $close;
+													$pubChange[] 		= $change;
+													$pubTrade[] 		= $trade;
+													$pubVolume[] 		= $volume;
+													$pubValueInMn[] 	= $valueInMn;
+													
+													$scripId = $dbScripId[array_search(strtoupper($symbol),$dbScripSymbol)];
+													
+													$color = ($count%2) ? "#f7f4f4":"#e5ffe5";
+													
+													$marketPriceDisplay	.= "
+													<tr style='text-align:right; background:".$color."'>
+														<td>".$count."</td>
+														<td style='text-align:left;'>".$symbol."<input type='hidden' name='evenLotScrip[]' value='".$scripId."'/></td>
+														<td>".$open."<input type='hidden' name='evenLotOpen[]' value='".$open."'/></td>
+														<td>".$high." <input type='hidden' name='evenLotHigh[]' value='".$high."'/></td>
+														<td>".$low." <input type='hidden' name='evenLotLow[]' value='".$low."'/></td>
+														<td>".$close." <input type='hidden' name='evenLotClose[]' value='".$close."'/></td>
+														<td>".$change." <input type='hidden' name='evenLotChange[]' value='".$change."'/></td>
+														<td>".$trade." <input type='hidden' name='evenLotTrade[]' value='".$trade."'/></td>
+														<td>".$volume." <input type='hidden' name='evenLotVolume[]' value='".$volume."'/></td>
+														<td>".$valueInMn." <input type='hidden' name='evenLotValue[]' value='".$valueInMn."'/></td>
+													</tr>
+													";
+													$count++;	
+												} else {
+													$errorType	= 'Number';
+													$errorLine	= $count;
+													$businessDateError	= 1;
+													break;	
+												}
+												
+											}
+										} else {
+											$errorType	= 'Date';
+											$errorLine	= $count;
+											$businessDateError	= 1;
+											break;
+										}	
+									}
+								}
+								
+								fclose($this->fileContents);
+							}
+							
+							$nonTradedScrip = array_diff($dbScripSymbol, $pubScripName);
+							if(sizeof($nonTradedScrip) > 0) {
+								$marketPriceDisplay	.= "
+								<tr style='font-weight:bold; height:40px; background:#e8e1e1;text-transform:upper;'><td colspan='10' valign='bottom'>Non traded scrip are listed below - </td></tr>
+								<tr style='background:#f7f4f4;'><td colspan='10'>".implode("<br/>",$nonTradedScrip)."</td></tr>
+								";
+							}
+							
+						}
+					} else {
+						$errorType	= 'Head';
+						$errorLine	= 0;
+						$businessDateError	= 1;
+					}
+					
+					$errorMessage	= '';
+					if($businessDateError) {
+						opendir("public/uploaddir/marketprice");
+						$pathFileName = 'market_price_'.str_replace('-','_',$this->businessdate).'.csv';
+						chmod("public/uploaddir/marketprice" ."/". $pathFileName, 0750);
+						unlink("public/uploaddir/marketprice" ."/". $pathFileName);
+						closedir(opendir("public/uploaddir/marketprice"));
+						
+						if($errorType == 'Number') {
+							$errorMessage	= "Number Format Missmatch During Market Price Upload at line [ ".$errorLine." ] !";
+						} else if ($errorType == 'Date') {
+							$errorMessage	= "Business Date [ ".$this->businessdate." ] & Market Price Date [ ".$mktInfoDate." ] Missmatch During Market Price Upload at line [ ".$errorLine." ] !";
+						} else if ($errorType == 'Head') {
+							$errorMessage	= "Expected Column Name & Sequence : [BUSINESS_DATE, SYMBOL, OPEN, HIGH, LOW, CLOSE, CHANGE, TRADE, VOLUME, VALUE]!";
+							$errorMessage	.= "<br>";
+							$errorMessage	.= "But Existing Market Price File Head Missmatch!";
+						}  else {
+							$errorMessage	= "There is Unknown Error During Market Price Upload!";
+						}
+						
+						echo $marketPriceDisplay	= "
+						<tr style='font-weight:bold; height:50px; background:#e8e1e1;text-transform:upper;font-size:15px;'>
+							<td colspan='10' valign='middle' align='center' style='color:red'>
+								".$errorMessage."
+							</td>
+						</tr>
+						";
+						
+					} else {
+						echo $marketPriceDisplay;	
+					}
+				?>
+                	
+                	</tbody>
+                </table>
+                </div>
+                <?php
+					if($businessDateError) {
+				?>
+					<table style="width:100%;">
+						<tr>
+							<td align="center">
+								<?php echo $this->formRow($form->get('btnBack')); ?> &nbsp;
+								<?php echo $this->formRow($form->get('btnLogout')); ?>
+							</td>
+						</tr>
+					</table>
+                <?php 
+					} else {
+				?>
+                	<table style="width:100%;">
+						<tr>
+							<td align="center">
+								<?php echo $this->formRow($form->get('btnEOD')); ?> &nbsp;
+								<?php echo $this->formRow($form->get('btnBack')); ?> &nbsp;
+								<?php echo $this->formRow($form->get('btnLogout')); ?>
+							</td>
+						</tr>
+					</table>	
+
+                <?php		
+					} 	
+				?>    
+                <script language="javascript" type="text/javascript">
+					function check() {
+						if(!confirm('Are you sure, you want to proceed?')) {
+							return false;
+						}
+						var nonTradedScrip = <?php echo sizeof($nonTradedScrip);?>;
+						if( parseInt(nonTradedScrip) > 0) {
+							if(!confirm("Are you sure following scrip(s) are not traded today? - <?php echo implode(' \n ',$nonTradedScrip); ?> ")) {
+								return false; 
+							}
+						}
+						
+						return true;
+					}
+				</script>
+            
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>

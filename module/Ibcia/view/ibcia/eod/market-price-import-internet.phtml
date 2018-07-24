@@ -1,0 +1,341 @@
+<?php
+//filename : module/Ibcia/view/ibcia/eod/eod-backup.phtml
+$title = 'Market Price Import: '.$this->businessdate;
+$this->headTitle($title);
+$miTable	= '';
+?>
+
+<div class='wrap-security'>
+	<div class="banner">
+		<img src="../img/logo.png" alt="Organization banner" width="288" height="72" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('style','width:1000px; height:350px; left:28%;');
+			$form->setAttribute('action', $this->url('businessdate'));
+			$form->prepare();
+			 
+			echo $this->form()->openTag($form);
+		?>
+			<h2><?php echo $this->escapeHtml($title); ?></h2>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+			
+            <div style="height:280px; overflow:auto">
+            <table class="market-price" cellpadding='3' cellspacing='1' border='0' width='100%' style='font-family:Arial, Helvetica, sans-serif; margin:0px auto 0px auto; font-size:70%;'>
+            	<thead>
+                	<tr>
+                    	<td colspan="10">&nbsp;</td>
+                    </tr>
+                    <tr id='loading' style='height:80px; padding:0px; text-align:center; display:none;'>
+                        <td colspan="10" align='center' style='height:100px; padding:0px; text-align:center;'>
+                            <h4 style='font-weight:normal;margin-top:0px;'>Please, wait while price importing in process . . .</h4>
+                            <span>
+                                <img src='../img/preloader2.gif' style='width:40px;' />
+                            </span>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+			<?php
+            		//echo "<pre>";
+					//print_r($this->lScripInfo['SYMBOL']);
+					//die();
+					if(sizeof($this->lScripInfo) > 0){
+						$dbScripId 		= $this->lScripInfo['INSTRUMENT_DETAILS_ID'];
+						$dbScripSymbol 	= $this->lScripInfo['SYMBOL'];
+						
+						$tradeInfoTitles = array(
+												'PRICES IN PUBLIC TRANSACTIONS : '.$this->currTradeDate,
+												'PRICES IN SPOT TRANSACTIONS : '.$this->currTradeDate,
+												'PRICES IN SPOT TRANSACTIONS (TREASURY BONDS) : '.$this->currTradeDate,
+												'PRICES IN ODDLOT TRANSACTIONS : '.$this->currTradeDate,
+												'PRICES IN BLOCK TRANSACTIONS : '.$this->currTradeDate
+												);
+						
+						$allContent = explode("\n", $this->fileContents);
+						$allContent = implode('@_$$_@',array_filter(array_map('trim', $allContent)));
+						$allContent = explode('@_$$_@', $allContent);
+						
+						//public trade information desk
+						$pubScripName 	= array();
+						$pubOpenPrice 	= array();
+						$pubHighPrice 	= array();
+						$pubLowPrice 	= array();
+						$pubClosePrice 	= array();
+						$pubChange 		= array();
+						$pubTrade 		= array();
+						$pubVolume 		= array();
+						$pubValueInMn 	= array();
+						
+						//spot trade information desk
+						$spotScripName 		= array();
+						$spotOpenPrice 		= array();
+						$spotHighPrice 		= array();
+						$spotLowPrice 		= array();
+						$spotClosePrice 	= array();
+						$spotChange 		= array();
+						$spotTrade 			= array();
+						$spotVolume 		= array();
+						$spotValueInMn 		= array();
+						
+						/*echo "<pre>";
+						print_r($allContent);
+						die();*/
+						
+						for($i=0; $i < sizeof($allContent); $i++) {
+							$title = strtoupper($allContent[$i]);
+							switch($title) {
+								case 'PRICES IN PUBLIC TRANSACTIONS : '.$currTradeDate :
+										?>
+										<tr style='font-weight:bold;height:40px;background:#e8e1e1;'>
+                                            <td colspan='9' valign='bottom'>PRICES IN PUBLIC TRANSACTIONS</td>
+                                            <td valign='bottom' style='text-align:right;'>
+                                                <a href='csv_report/dse_public_tran_{$mkreportname}.csv' target='_blank'><img src='images/csv_icon.gif' width='24' title='Export as CSV' alt='Export as CSV' border='0' style='padding:0px 0px 5px 0px;' /></a>
+                                            </td>
+                                        </tr>
+                                        <tr style='font-weight:bold; height:30px; text-align:right; background:#eee9e9;'>
+                                            <td>Sl No.</td>
+                                            <td style='text-align:left;'>Scrip</td>
+                                            <td>Open</td>
+                                            <td>High</td>
+                                            <td>Low</td>
+                                            <td>Close</td>
+                                            <td>Change(%)</td>
+                                            <td>Trade</td>
+                                            <td>Volume</td>
+                                            <td>Value(Mn)</td>
+                                        </tr>
+                                        <?php
+										$i++;
+										$count = 1;
+										for($i; $i < sizeof($allContent); $i++) {
+											$scripInfo = $allContent[$i];
+											if(!in_array(strtoupper($scripInfo),$tradeInfoTitles)) {
+												$scripLists = explode(' ',$scripInfo);
+												$scripLists = array_filter(array_map('trim', $scripLists));
+												$scripLists = implode('@_$$_@',array_filter(array_map('trim', $scripLists)));
+												$scripLists = explode('@_$$_@', $scripLists);
+												//print_r($scripLists);
+												if((sizeof($scripLists) == 9) && is_string($scripLists[0]) && is_numeric($scripLists[1]) && is_numeric($scripLists[2]) && is_numeric($scripLists[3]) && is_numeric($scripLists[4])) {
+													if(in_array(strtoupper($scripLists[0]),$dbScripSymbol)) {
+														$pubScripName[] 	= $scripLists[0];
+														$pubOpenPrice[] 	= $scripLists[1];
+														$pubHighPrice[] 	= $scripLists[2];
+														$pubLowPrice[] 		= $scripLists[3];
+														$pubClosePrice[] 	= $scripLists[4];
+														$pubChange[] 		= $scripLists[5];
+														$pubTrade[] 		= $scripLists[6];
+														$pubVolume[] 		= $scripLists[7];
+														$pubValueInMn[] 	= $scripLists[8];
+														
+														$scripId = $dbScripId[array_search(strtoupper($scripLists[0]),$dbScripSymbol)];
+														
+														$color = ($count%2) ? "#f7f4f4":"#e5ffe5";
+														?>
+														<tr style='text-align:right; background:<?php echo $color;?>'>
+                                                            <td><?php echo $count;?></td>
+                                                            <td style='text-align:left;'><?php echo $scripLists[0];?> <input type='hidden' name='evenLotScrip[]' value='<?php echo $scripId;?>'/></td>
+                                                            <td><?php echo $scripLists[1];?> <input type='hidden' name='evenLotOpen[]' value='<?php echo $scripLists[1];?>'/></td>
+                                                            <td><?php echo $scripLists[2];?> <input type='hidden' name='evenLotHigh[]' value='<?php echo $scripLists[2];?>'/></td>
+                                                            <td><?php echo $scripLists[3];?> <input type='hidden' name='evenLotLow[]' value='<?php echo $scripLists[3];?>'/></td>
+                                                            <td><?php echo $scripLists[4];?> <input type='hidden' name='evenLotClose[]' value='<?php echo $scripLists[4];?>'/></td>
+                                                            <td><?php echo $scripLists[5];?> <input type='hidden' name='evenLotChange[]' value='<?php echo $scripLists[5];?>'/></td>
+                                                            <td><?php echo $scripLists[6];?> <input type='hidden' name='evenLotTrade[]' value='<?php echo $scripLists[6];?>'/></td>
+                                                            <td><?php echo $scripLists[7];?> <input type='hidden' name='evenLotVolume[]' value='<?php echo $scripLists[7];?>'/></td>
+                                                            <td><?php echo $scripLists[8];?> <input type='hidden' name='evenLotValue[]' value='<?php echo $scripLists[8];?>'/></td>
+                                                        </tr>
+														<?php
+														$count++;
+													}
+												}
+											} else {
+												$i--;
+												break;
+											}
+										}
+										break;
+										//public scrip market information scraping end
+								case 'PRICES IN SPOT TRANSACTIONS : '.$currTradeDate :
+										?>
+										<tr style='font-weight:bold; height:40px; background:#e8e1e1;'><td colspan='10' valign='bottom'>PRICES IN SPOT TRANSACTIONS</td></tr>
+										<tr style='font-weight:bold; height:30px; text-align:right; background:#eee9e9;'>
+                                            <td>Sl No.</td>
+                                            <td style='text-align:left;'>Scrip</td>
+                                            <td>Open</td>
+                                            <td>High</td>
+                                            <td>Low</td>
+                                            <td>Close</td>
+                                            <td>Change(%)</td>
+                                            <td>Trade</td>
+                                            <td>Volume</td>
+                                            <td>Value(Mn)</td>
+                                        </tr>
+										<?php
+										$i++;
+										$count = 1;
+										for($i; $i < sizeof($allContent); $i++) {
+											$scripInfo = $allContent[$i];
+											if(!in_array(strtoupper($scripInfo),$tradeInfoTitles)) {
+												$scripLists = explode(' ',$scripInfo);
+												$scripLists = array_filter(array_map('trim', $scripLists));
+												$scripLists = implode('@_$$_@',array_filter(array_map('trim', $scripLists)));
+												$scripLists = explode('@_$$_@', $scripLists);
+												if((sizeof($scripLists) == 9) && is_string($scripLists[0]) && is_numeric($scripLists[1]) && is_numeric($scripLists[2]) && is_numeric($scripLists[3]) && is_numeric($scripLists[4])) {
+													if(in_array(strtoupper($scripLists[0]),$dbScripSymbol)) {
+														$spotScripName[] 	= $scripLists[0];
+														$spotOpenPrice[] 	= $scripLists[1];
+														$spotHighPrice[] 	= $scripLists[2];
+														$spotLowPrice[]		= $scripLists[3];
+														$spotClosePrice[] 	= $scripLists[4];
+														$spotChange[] 		= $scripLists[5];
+														$spotTrade[] 		= $scripLists[6];
+														$spotVolume[] 		= $scripLists[7];
+														$spotValueInMn[] 	= $scripLists[8];
+														
+														$scripId = $dbScripId[array_search(strtoupper($scripLists[0]),$dbScripSymbol)];
+														
+														$color = ($count%2) ? "#f7f4f4":"#e5ffe5";
+														?>
+														<tr style='text-align:right; background:<?php echo $color;?>'>
+                                                            <td><?php echo $count;?></td>
+                                                            <td style='text-align:left;'><?php echo $scripLists[0];?> <input type='hidden' name='evenLotScrip[]' value='<?php echo $scripId;?>'/></td>
+                                                            <td><?php echo $scripLists[1];?> <input type='hidden' name='evenLotOpen[]' value='<?php echo $scripLists[1];?>'/></td>
+                                                            <td><?php echo $scripLists[2];?> <input type='hidden' name='evenLotHigh[]' value='<?php echo $scripLists[2];?>'/></td>
+                                                            <td><?php echo $scripLists[3];?> <input type='hidden' name='evenLotLow[]' value='<?php echo $scripLists[3];?>'/></td>
+                                                            <td><?php echo $scripLists[4];?> <input type='hidden' name='evenLotClose[]' value='<?php echo $scripLists[4];?>'/></td>
+                                                            <td><?php echo $scripLists[5];?> <input type='hidden' name='evenLotChange[]' value='<?php echo $scripLists[5];?>'/></td>
+                                                            <td><?php echo $scripLists[6];?> <input type='hidden' name='evenLotTrade[]' value='<?php echo $scripLists[6];?>'/></td>
+                                                            <td><?php echo $scripLists[7];?> <input type='hidden' name='evenLotVolume[]' value='<?php echo $scripLists[7];?>'/></td>
+                                                            <td><?php echo $scripLists[8];?> <input type='hidden' name='evenLotValue[]' value='<?php echo $scripLists[8];?>'/></td>
+                                                        </tr>
+														<?php
+														$count++;
+													}
+												}
+											} else {
+												$i--;
+												break;
+											}
+										}
+										break;
+								case 'PRICES IN SPOT TRANSACTIONS (TREASURY BONDS) : '.$currTradeDate :
+										$content[] = $title;
+										break;
+								case 'PRICES IN ODDLOT TRANSACTIONS : '.$currTradeDate :
+										$content[] = $title;
+										break;
+								case 'PRICES IN BLOCK TRANSACTIONS : '.$currTradeDate :
+										$content[] = $title;
+										break;
+							}// switch statement end
+						}// all content for loop end
+						
+					
+						$nonTradedScrip = array_diff($dbScripSymbol, $pubScripName);
+						$nonTradedScrip = array_diff($nonTradedScrip, $spotScripName);
+						if(sizeof($nonTradedScrip) > 0) {
+						?>
+							<tr style='font-weight:bold; height:40px; background:#e8e1e1;text-transform:upper;'><td colspan='10' valign='bottom'>Non traded scrip are listed below - </td></tr>
+							<tr style='background:#f7f4f4;'><td colspan='10'><?php echo implode("<br/>",$nonTradedScrip); ?></td></tr>
+                        <?php
+						}
+					}
+					
+				
+				//Start Non-Listed Scrip Market Information
+				
+				if(sizeof($this->nlScripInfo)>0) {
+					$dbNLScripId 	= $this->nlScripInfo['INSTRUMENT_DETAILS_ID'];
+					$dbNLScripName 	= $this->nlScripInfo['INSTRUMENT_NAME'];
+				
+					$miTable .= "<tr style='font-weight:bold; height:40px; background:#e8e1e1;'><td colspan='10' valign='bottom'>NAV of Non-Listed Mutual Fund</td></tr>";
+					$miTable .= "<tr style='font-weight:bold; height:30px; text-align:right; background:#eee9e9;'>
+													<td>Sl No.</td>
+													<td style='text-align:left;' colspan='2'>Scrip</td>
+													<td colspan='6'>Close</td>
+													<td >As on</td>
+												 </tr>";
+					$count = 1;
+					for($nls=0;$nls<sizeof($dbNLScripName);$nls++) {
+						$color = ($count%2) ? "#f7f4f4":"#e5ffe5";
+						
+						$close_price 	= 0;
+						$as_on			= '';
+						/*$queryMarketInfo="select 
+													CLOSE_PRICE,
+													to_char(BUSINESS_DATE,'dd-mm-yyyy')
+											from 	
+													I_MARKET_INFO,S_SCRIP
+											where 	I_MARKET_INFO.SCRIP_ID=".$dbNLScripId[$nls]."
+											AND 	I_MARKET_INFO.MARKET_INFO_ID = (SELECT
+																								MAX(I_MARKET_INFO.MARKET_INFO_ID)
+																					  FROM
+																								I_MARKET_INFO
+																					  WHERE
+																								I_MARKET_INFO.SCRIP_ID = ".$dbNLScripId[$nls]."
+																					  AND		I_MARKET_INFO.BUSINESS_DATE = (SELECT MAX(I_MARKET_INFO.BUSINESS_DATE)
+																																FROM    I_MARKET_INFO
+																																WHERE   I_MARKET_INFO.SCRIP_ID = ".$dbNLScripId[$nls]."
+																																AND 	I_MARKET_INFO.CLOSE_PRICE > 0
+																																AND		I_MARKET_INFO.BUSINESS_DATE < to_date('".$businessDate."','dd-mm-yyyy')
+																													   )
+												  )
+											and 	S_SCRIP.SCRIP_ID=I_MARKET_INFO.SCRIP_ID";
+						
+						
+						$marketInfoStatement = oci_parse($this->con, $queryMarketInfo);
+						oci_execute($marketInfoStatement);
+						while(oci_fetch($marketInfoStatement)) {
+							$close_price = oci_result($marketInfoStatement,1);
+							$as_on = oci_result($marketInfoStatement,2);
+						}*/
+						
+						?>
+                        <tr style='text-align:right; background:{$color}'>
+                            <td><?php echo $count; ?></td>
+                            <td style='text-align:left;' colspan='2'>
+                                <?php echo $dbNLScripName[$nls]; ?> <input type='hidden' name='NLScrip[]' value='<?php echo $dbNLScripName[$nls]; ?>'/>
+                            </td>
+                            <td colspan='6'><input type='text' name='NLClose[]' id='NLClose<?php echo $dbNLScripId[$nls];?>' value='<?php echo number_format( $close_price,2); ?>' onfocus="if(this.value=='0.00') this.value='';" onblur="if((this.value=='') || this.value==0) this.value='0.00';numberFormat(this.id,this.value.toString(),'2',',','.');" class='FormNumericTypeInput' onkeyup='removeChar(this);'/></td>
+                            <td><?php echo $as_on; ?></td>
+                        </tr>
+                        <?php
+						$count++;
+					}
+				}
+				//End Non-Listed Scrip Market Information
+				?>
+                	</tbody>
+                </table>
+                </div>
+                <table style="width:100%;">
+                    <tr>
+                        <td align="center">
+							<?php echo $this->formRow($form->get('btnEOD')); ?> &nbsp;
+                            <?php echo $this->formRow($form->get('btnBack')); ?> &nbsp;
+                            <?php echo $this->formRow($form->get('btnLogout')); ?>
+                        </td>
+                    </tr>
+                </table>
+                <script language="javascript" type="text/javascript">
+					function check() {
+						if(!confirm('Are you sure, you want to proceed?')) {
+							return false;
+						}
+						var nonTradedScrip = <?php echo sizeof($nonTradedScrip);?>;
+						if( parseInt(nonTradedScrip) > 0) {
+							if(!confirm("Are you sure following scrip(s) are not traded today? - <?php echo implode(' \n ',$nonTradedScrip); ?> ")) {
+								return false; 
+							} else {
+								$("#loading").show();								
+							}
+						} 
+						return true;
+					}
+				</script>
+            
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>

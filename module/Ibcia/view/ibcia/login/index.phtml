@@ -1,0 +1,57 @@
+<?php
+//filename : module/Ibcia/view/ibcia/auth/index.phtml
+$title = 'Welcome';
+$this->headTitle($title);
+?>
+
+<div class='wrap-security'>
+	<div class="banner" style="padding-top:20px;">
+		<img src="../img/logo.png" alt="Organization banner" width="350" height="110" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+    	<script language="javascript" type="text/javascript">
+			function check() {
+				if(document.getElementById('username').value=="") {
+					alert('Enter User Name');
+					document.getElementById('username').focus();
+					return false;
+				} else if(document.getElementById('password').value=="") {
+					alert('Enter Password');
+					document.getElementById('password').focus();
+					return false;
+				}
+				return true;
+			}
+		</script>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('action', $this->url('login'));
+			$form->prepare();
+			echo $this->form()->openTag($form);
+		?>
+       <!-- <table width="50%" border="1" cellpadding="2" cellspacing="2" align="center">
+        	<tr>
+            	<td><h1><?php //echo $this->escapeHtml($title); ?></h1></td>
+            </tr>
+            <tr>
+            	<td></td>
+            </tr>
+        </table>-->
+        	<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+			<fieldset id="inputs">
+            	<?php 
+					echo $this->formRow($form->get('OPERATOR_NAME')); 
+					echo $this->formRow($form->get('OPERATOR_PASSWORD'));
+					echo $this->formRow($form->get('REMEMBER_ME'));
+				?>
+			</fieldset>
+			<fieldset class="actions">
+            	<?php 
+					echo $this->formRow($form->get('btnLogin'));
+				?>
+			</fieldset>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>

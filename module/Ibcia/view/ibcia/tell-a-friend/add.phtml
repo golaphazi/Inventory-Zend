@@ -1,0 +1,45 @@
+<?php
+	$title = 'Tell A Friend';
+	$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title);?></h1> 
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('tellafriend',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+?>
+<table width="100%" border="0" cellpadding="2" cellspacing="2" style="margin:0px; font-size:85%; border:1px dotted #888;line-height:1em; font-family:Tahoma, Geneva, sans-serif;" align="center">
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td colspan="2">
+            <p>We grow our business through client referrals. If you've been happy with company services and our work together, please tell a friend!</p>
+            <p>Filling out the following form is a quick and easy way to let others know about our services. The mandatory fields are denoted with an asterisk (*).</p>
+       	</td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td width="20%">From</td>
+        <td width="80%"><?php echo $this->formRow($form->get('YOURNAME')); ?><sup style="color:red;">*</sup></td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td width="20%">Your Email</td>
+        <td width="80%"><?php echo $this->formRow($form->get('YOUREMAIL')); ?><sup style="color:red;">*</sup></td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td width="20%">To</td>
+        <td width="80%"><?php echo $this->formRow($form->get('TONAME')); ?><sup style="color:red;">*</sup></td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td width="20%">To Email</td>
+        <td width="80%"><?php echo $this->formRow($form->get('TOEMAIL')); ?><sup style="color:red;">*</sup></td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td colspan="2">Comments<sup style="color:red;">*</sup><br/>
+           <textarea name="BODY" id="BODY" rows="5" style="width:90%;padding-left:10px;font-family:Tahoma, Geneva, sans-serif;">I'm emailing because I thought you might be interested in getting in touch with IBIZCARE Inventory Accounts Software. You can take a look at their website at http://www.betaone.com.</textarea>
+        </td>
+    </tr>
+    <tr valign="top" style="border:1px dotted #888;line-height:2em;">
+    	<td colspan="2"><?php echo $this->formRow($form->get('submit')); ?>&nbsp;
+		<input type="reset" name="reset" id="reset" value="Reset"/>&nbsp;
+		<?php echo $this->formRow($form->get('Close')); ?></td>
+    </tr>
+</table>

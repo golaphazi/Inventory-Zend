@@ -1,0 +1,139 @@
+<?php
+//filename : module/Ibcia/view/ibcia/business-date/index.phtml
+$title = 'Business Date Setup';
+$this->headTitle($title);
+?>
+
+<div class='wrap-security'>
+	<div class="banner">
+		<img src="../img/logo.png" alt="Organization banner" width="288" height="72" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+    	<script language="javascript" type="text/javascript">
+			function check() {
+				if(document.getElementById('businessdate').value=="") {
+					alert('Please, select business date.');
+					document.getElementById('businessdate').focus();
+					return false;
+				}
+				
+				return true;
+			}
+		</script>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('action', $this->url('businessdate'));
+			$form->setAttribute('style', 'width:500px; height:150px;');
+			$form->prepare();
+			 
+			echo $this->form()->openTag($form);
+		?>
+			<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+			<fieldset id="inputs">
+            	<table style="width:100%;">
+                	<tr>
+                    	<td align="center">
+							<?php 
+                                echo $this->formRow($form->get('BUSINESS_DATE')); 
+                            ?>
+                        </td>
+                    </tr>
+                </table>
+			</fieldset>
+            <table style="width:100%;">
+                <tr class="actions">
+                    <td align="center">
+                        <?php 
+                            echo $this->formRow($form->get('actBDate'));
+                            echo $this->formRow($form->get('uEHDays'));
+                            echo $this->formRow($form->get('btnSave'));?> &nbsp;
+                            <?php echo $this->formRow($form->get('btnLogout'));?>
+                    </td>
+                </tr>
+            </table>
+		<?php echo $this->form()->closeTag(); ?>
+        
+        <script language='javascript' type='text/javascript'>
+			var holidays = <?php echo $jshd; ?>;
+			function disableAllTheseDays(date) {
+				var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
+				for(var i=0; i < holidays.length; i++) {
+					if($.inArray((m+1) + '-' + d + '-' + y,holidays) != -1) {
+						return [false];
+					}
+					return [true];
+				}
+			}
+			
+			function getUEHDays(dStrStart, dStrEnd) {
+				var dStart = new Date(dStrStart);
+				var dEnd = new Date(dStrEnd);
+			
+				var jUEHDays = '';
+			
+				if(dStart < dEnd) {
+					for(var nd = dStart; nd < dEnd; nd.setDate(nd.getDate() + 1)) {
+						var m = nd.getMonth(), d = nd.getDate(), y = nd.getFullYear();
+						if($.inArray((m+1) + '-' + d + '-' + y,holidays) == -1) {
+							jUEHDays = jUEHDays + '"' + (d + '-' + (m+1) + '-' + y) + '", ';
+						}
+					}
+				}
+				jUEHDays = jUEHDays.replace(/(^\s*,)|(,\s*$)/g, '');
+	
+				return jUEHDays;
+			}
+	
+	
+			function check() {
+				var bDate = String($('#businessdate').val());
+				
+				if(bDate == '') {
+					alert('Please, select business date');
+					document.getElementById('businessdate').focus();
+					return false;
+				}
+				
+				bDate = bDate.split('-');
+				bDate = bDate[1]+'/'+bDate[0]+'/'+bDate[2];
+	
+				bDate = new Date(bDate);
+				var actBDate = new Date($('#actBDate').val());
+				
+				if((bDate - actBDate) > 0) {
+					var jUEHDays = getUEHDays(actBDate,bDate);
+					if(!confirm('Are you sure you want to declare '+jUEHDays+' as unexpected holiday(s)?')) {
+						$('#uEHDays').val('');
+						return false;
+					}
+					var pUEHDays = jUEHDays.replace(/\"/g,'');
+					$('#uEHDays').val(pUEHDays);
+				} else {
+					$('#uEHDays').val('');
+				}
+				
+				return true;
+			}
+			
+			$(function() {
+				
+				var mndate = new Date('<?php echo $jBMinDate;?>');
+				var mnm = mndate.getMonth(), mnd = mndate.getDate(), mny = mndate.getFullYear();
+				var mxdate = new Date('<?php echo $jBMaxDate;?>');
+				var mxm = mxdate.getMonth(), mxd = mxdate.getDate(), mxy = mxdate.getFullYear();
+				if(mny == mxy){
+					mxy = mxy+1;
+				}
+				//alert(mxy);
+				$('#businessdate').datepicker({
+					minDate : new Date(mny, mnm, mnd),
+					maxDate : new Date(mxy, mxm, mxd),
+					dateFormat : 'dd-mm-yy',
+					beforeShowDay: disableAllTheseDays
+				});
+			});
+		</script>
+	</div>
+</div>

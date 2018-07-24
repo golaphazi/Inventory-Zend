@@ -1,0 +1,374 @@
+<?php
+//filename : module/Ibcia/view/ibcia/holiday/index.phtml
+$title = 'Holiday Setup';
+$this->headTitle($title);
+?>
+
+<div class='wrap-security'>
+	<div class="banner">
+		<img src="../img/logo.png" alt="Organization banner" width="288" height="72" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+    	<script language="javascript" type="text/javascript">
+			function check() {
+				if(document.getElementById('businessdate').value=="") {
+					alert('Please, select business date.');
+					document.getElementById('businessdate').focus();
+					return false;
+				}
+				
+				return true;
+			}
+		</script>
+        <style type="text/css">
+        	#dateInput {
+				display:block;
+			}
+        	#weekdays {
+				display:none;
+			}
+			#showSave {
+				display:none;
+			}
+			#YEAR {
+				width:80px;
+			}
+			#DESCRIPTION {
+				width:350px;
+			}
+        </style>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('style','width:1000px; height:350px; left:28%;');
+			$form->setAttribute('action', $this->url('businessdate'));
+			$form->prepare();
+			
+			echo $this->form()->openTag($form);
+		?>
+			<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+            <table id="holidayTable">
+            	<thead>
+                    <tr>
+                        <th align="left" width="120px">Type</th>
+                        <th align="left" width="420px">Date/Day</th>
+                        <th align="left" width="360px">Description</th>
+                        <th align="center" width="100px">Action</th>
+                    </tr>
+                    <tr>
+                        <th align="left"><?php echo $this->formRow($form->get('TYPE')); ?></th>
+                        <th style="font-weight:normal;" align="left">
+                            <span id="dateInput">
+								<?php echo $this->formRow($form->get('HOLIDAY'));?>
+                                
+                            </span>
+							<span id="weekdays">
+								<?php
+									echo $this->formRow($form->get('YEAR'));
+									echo $this->formRow($form->get('WEEKDAYS'));
+								?>
+                            </span>
+                        </th>
+                        <th align="left"><?php echo $this->formRow($form->get('DESCRIPTION')); ?></th>
+                        <th align="center">
+                        	<input type="hidden" name="rowIndex" id="rowIndex" value="" data-modelproperty='rowIndex'/>
+                        	<span id='showAdd'><a href="#" id="add">Add</a></span>
+                            <span id='showSave'><a href="#" id="save">Save</a></span> &nbsp; &nbsp; 
+                            <span id='showClear'><a href="#"  id="clear">Clear</a></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <fieldset class="actions">
+            	<?php 
+					echo $this->formRow($form->get('save'));
+				?>
+			</fieldset>
+		<?php echo $this->form()->closeTag(); ?>
+        <script language='javascript' type='text/javascript'>
+			;
+			(function($, undefined){
+				
+				var attachHandlers = function (element) {
+					var handler = {
+						onEditClick: function () {
+							var currRow = $(this).parents('tr');
+							var rowIndex = $(this).closest('td').parent()[0].sectionRowIndex;
+							$(currRow).find('input[type=hidden]').each(function(i){
+								var dataModelProperty = $(this).attr('name');
+								var value = $(this).val();
+								$('#holidayTable').find('select[data-modelproperty=' + dataModelProperty + '], input[data-modelproperty=' + dataModelProperty + ']').each(function(){
+									if($(this).is('select')) {
+										$(this).find('option[value="' + value + '"]').attr('selected', true);
+									} else {
+										$(this).val(value);
+									}
+								});
+							});
+							$('#holidayTable').find('input[data-modelproperty=rowIndex]').each(function(){
+								$(this).val(rowIndex);
+							});
+							
+							$('#showAdd').css({'display':'none'});
+							$('#showSave').css({'display':'block'});
+						},
+						onRemoveClick: function () {
+							var currRow = $(this).parents('tr');
+							if(confirm('Are you sure, you want to delete this row?')) {
+								currRow.remove();
+							}
+							return true;
+						}
+					};
+		
+					element.find('[data-handler]').map(function () {
+						$(this).unbind(this.getAttribute('data-event')).bind(this.getAttribute('data-event'), handler[this.getAttribute('data-handler')]);
+					});
+				};
+				
+				var onHolidayTypeChange = function () {
+					var type = $(this).val();
+					if(type.toLowerCase() == 'weekend') {
+						$('#dateInput').css({'display':'none'});
+						$('#weekdays').css({'display':'block'});
+					}
+					
+					if(type.toLowerCase() == 'public holiday') {
+						$('#dateInput').css({'display':'block'});
+						$('#weekdays').css({'display':'none'});
+					}
+				}
+				
+				var onAddClick = function() {
+					var weekDays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+					String.prototype.lpad = function(padString, length) {
+						str = this;
+						while(str.length < length) 
+							str = padString + str;
+						return str;
+					}
+					
+					Date.prototype.getMonthDays = function() {
+						var month = new Date(this.getFullYear(), this.getMonth()+1, 0);
+						return month.getDate();
+					}
+					
+					Date.prototype.getDayName = function() {
+						var date = new Date(this.getFullYear(), this.getMonth(), this.getDate());
+						return weekDays[date.getDay()];
+					}
+					
+					var type = $('#TYPE').val();
+					var newHolidays = '';
+					if(type.toLowerCase() == 'weekend') {
+						
+						var holidayYear = $('#YEAR').val();
+						var weekEndDays = new Array();
+						$('#weekdays input:checked').each(function() {
+							if($.inArray($(this).attr('value').toLowerCase(), weekDays) !== -1) {
+								weekEndDays.push($(this).attr('value').toLowerCase());
+							}
+						});
+						var holidayDesc = $('#DESCRIPTION').val();
+						
+						if(holidayYear.length <= 0) {
+							$('.error-msg').html('Please, enter a year!');
+							return false;
+						}
+						if(weekEndDays.length <= 0) {
+							$('.error-msg').html('Please, check at least one day!');
+							return false;
+						}
+						
+						if(holidayYear.match(/^\d{4}$/) && (parseInt(holidayYear) >= 2000)) {
+							$('.error-msg').html('');
+							holidayYear = parseInt(holidayYear);
+							var weekEndDates = new Array();
+							
+							for(var m = 0; m < 12; m++) {
+								var mDays = new Date(holidayYear, m, 0).getMonthDays();
+								for(var d = 1; d <= mDays; d++) {
+									var date = new Date(holidayYear, m, d);
+									if($.inArray(date.getDayName(),weekEndDays) !== -1) {
+										var day = (String) (date.getDate());
+										var month = (String) (date.getMonth() + 1);
+										var year = (String) (date.getFullYear());
+										var dayname = weekDays[date.getDay()];
+										
+										var holidayDate = day.lpad('0',2) + '-' + month.lpad('0',2) + '-' + year;
+										newHolidays += '<tr><td align="left" width="120px"><span id="hType">' + type + '</span><input type="hidden" name="hType" value="' + type + '"/></td>';
+										newHolidays += '<td align="left" width="420px"><span id="hDate">' + holidayDate + ' (' + dayname + ')' + '</span><input type="hidden" name="hDate" value="' + holidayDate + '"/></td>';
+										newHolidays += '<td align="left" width="360px"><span id="hDesc">' + ((holidayDesc.legth > 150) ? holidayDesc.substring(0,150): holidayDesc) + '</span><input type="hidden" name="hDesc" value="' + ((holidayDesc.legth > 150) ? holidayDesc.substring(0,150): holidayDesc) + '"/></td>';
+										newHolidays += '<td align="center" width="100px"><a href="#" data-event="click" data-handler="onEditClick">Edit</a> &nbsp; &nbsp; <a href="#" data-event="click" data-handler="onRemoveClick">Rem</a></td>';
+									}
+								}
+							}
+							
+							
+						} else {
+							$('.error-msg').html('Please, enter a valid year( > 1999)!');
+							return false;
+						}
+					}
+					
+					if(type.toLowerCase() == 'public holiday') {
+						var holidayDate = $('#HOLIDAY').val();
+						var holidayDesc = $('#DESCRIPTION').val();
+						
+						if(holidayDate.length <= 0) {
+							$('.error-msg').html('Please, select date!');
+							return false;
+						}
+						
+						if(holidayDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/)) {
+							$('.error-msg').html('');
+							var temp = holidayDate.split('-');
+							var dayName = new Date(parseInt(temp[2]), (parseInt(temp[1]) - 1), parseInt(temp[0])).getDayName();
+							newHolidays = '<tr><td align="left" width="120px"><span id="hType">' + type + '</span><input type="hidden" name="hType[]" value="' + type + '"/></td>';
+							newHolidays += '<td align="left" width="420px"><span id="hDate">' + holidayDate + ' (' + dayname + ')' + '</span><input type="hidden" name="hDate[]" value="' + holidayDate + '"/></td>';
+							newHolidays += '<td align="left" width="360px"><span id="hDesc">' + ((holidayDesc.legth > 150) ? holidayDesc.substring(0,150): holidayDesc) + '</span><input type="hidden" name="hDesc[]" value="' + ((holidayDesc.legth > 150) ? holidayDesc.substring(0,150): holidayDesc) + '"/></td>';
+							newHolidays += '<td align="center" width="100px"><a href="#" data-event="click" data-handler="onEditClick">Edit</a> &nbsp; &nbsp; <a href="#" data-event="click" data-handler="onRemoveClick">Rem</a></td>';
+						} else {
+							$('.error-msg').html('Please, enter a valid date format!');
+							return false;
+						}
+					}
+					
+					$('#TYPE option[value="Public holiday"]').attr('selected', true);
+					$('#HOLIDAY').val('');
+					$('#weekdays input[type=checkbox]').each(function() {
+						$(this).attr('checked',false);
+					});
+					$('#YEAR').val('');
+					$('#dateInput').css({'display':'block'});
+					$('#weekdays').css({'display':'none'});
+					$('#DESCRIPTION').val('');
+					
+					var element = $('#holidayTable tbody').append(newHolidays);
+					attachHandlers(element);
+				}
+				
+				var onSaveClick = function() {
+					var type = $('#TYPE').val();
+					var holidayDate = $('#HOLIDAY').val();
+					var holidayDesc = $('#DESCRIPTION').val();
+					var rowIndex = $('#rowIndex').val();
+					
+					if(holidayDate.length <= 0) {
+						$('.error-msg').html('Please, select date!');
+						return false;
+					}
+					
+					if(holidayDate.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/)) {
+						$('.error-msg').html('');
+						var temp = holidayDate.split('-')
+						var dayName = new Date(parseInt(temp[2]), (parseInt(temp[1]) - 1), parseInt(temp[0])).getDayName();
+						
+						/*$('#holidayTable thead').find('select, input')
+						$('#holidayTable tbody').find('tr:eq(' + rowIndex + ')').each(function(){
+							
+						});*/
+						
+						newHolidays = '<tr><td align="left" width="120px">' + type + '</td>';
+						newHolidays += '<td align="left" width="420px">' + holidayDate + ' (' + dayName + ')' + '</td>';
+						newHolidays += '<td align="left" width="360px">' + ((holidayDesc.legth > 150) ? holidayDesc.substring(0,150): holidayDesc) + '</td>';
+						newHolidays += '<td align="center" width="100px"><a href="#" data-event="click" data-handler="onEditClick">Edit</a> &nbsp; &nbsp; <a href="#" data-event="click" data-handler="onRemoveClick">Rem</a></td>';
+					} else {
+						$('.error-msg').html('Please, enter a valid date format!');
+						return false;
+					}
+					
+				}
+				
+				$('#TYPE').unbind('change').bind('change', onHolidayTypeChange);
+				$('#add').unbind('click').bind('click', onAddClick);
+				$('#save').unbind('click').bind('click', onSaveClick);
+				
+				$('#HOLIDAY').datepicker({
+					dateFormat : 'dd-mm-yy'
+				});
+			})(jQuery);
+			
+		</script>
+        <!--<script language='javascript' type='text/javascript'>
+			var holidays = <?php //echo $jshd; ?>;
+			function disableAllTheseDays(date) {
+				var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
+				for(var i=0; i < holidays.length; i++) {
+					if($.inArray((m+1) + '-' + d + '-' + y,holidays) != -1) {
+						return [false];
+					}
+					return [true];
+				}
+			}
+			
+			function getUEHDays(dStrStart, dStrEnd) {
+				var dStart = new Date(dStrStart);
+				var dEnd = new Date(dStrEnd);
+			
+				var jUEHDays = '';
+			
+				if(dStart < dEnd) {
+					for(var nd = dStart; nd < dEnd; nd.setDate(nd.getDate() + 1)) {
+						var m = nd.getMonth(), d = nd.getDate(), y = nd.getFullYear();
+						if($.inArray((m+1) + '-' + d + '-' + y,holidays) == -1) {
+							jUEHDays = jUEHDays + '"' + (d + '-' + (m+1) + '-' + y) + '", ';
+						}
+					}
+				}
+				jUEHDays = jUEHDays.replace(/(^\s*,)|(,\s*$)/g, '');
+	
+				return jUEHDays;
+			}
+	
+	
+			function check() {
+				var bDate = String($('#businessdate').val());
+				
+				if(bDate == '') {
+					alert('Please, select business date');
+					document.getElementById('businessdate').focus();
+					return false;
+				}
+				
+				bDate = bDate.split('-');
+				bDate = bDate[1]+'/'+bDate[0]+'/'+bDate[2];
+	
+				bDate = new Date(bDate);
+				var actBDate = new Date($('#actBDate').val());
+				
+				if((bDate - actBDate) > 0) {
+					var jUEHDays = getUEHDays(actBDate,bDate);
+					if(!confirm('Are you sure you want to declare '+jUEHDays+' as unexpected holiday(s)?')) {
+						$('#uEHDays').val('');
+						return false;
+					}
+					var pUEHDays = jUEHDays.replace(/\"/g,'');
+					$('#uEHDays').val(pUEHDays);
+				} else {
+					$('#uEHDays').val('');
+				}
+				
+				return true;
+			}
+			
+			$(function() {
+				var mndate = new Date('<?php //echo $jBMinDate;?>');
+				var mnm = mndate.getMonth(), mnd = mndate.getDate(), mny = mndate.getFullYear();
+				
+				var mxdate = new Date('<?php //echo $jBMaxDate;?>');
+				var mxm = mxdate.getMonth(), mxd = mxdate.getDate(), mxy = mxdate.getFullYear();
+				
+				$('#businessdate').datepicker({
+					minDate : new Date(mny, mnm, mnd),
+					maxDate : new Date(mxy, mxm, mxd),
+					dateFormat : 'dd-mm-yy',
+					beforeShowDay: disableAllTheseDays
+				});
+			});
+		</script>-->
+	</div>
+</div>

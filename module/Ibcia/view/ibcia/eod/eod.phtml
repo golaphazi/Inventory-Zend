@@ -1,0 +1,52 @@
+<?php
+	//filename : module/Ibcia/view/ibcia/eod/eod.phtml
+	$title = 'Execute EOD : '.$this->businessdate;
+	$this->headTitle($title);
+?>
+
+<div class='wrap-security'>
+	<div class="banner">
+		<img src="../../img/logo.png" alt="Organization banner" width="288" height="72" title="IBIZCARE Inventory Accounts" />
+	</div>
+	<div>
+    	<script language="javascript" type="text/javascript">
+			function check() {
+				if(!confirm('Are you sure, you want to run EOD?')) {					
+					return false;
+				} else {
+					$("#loading").show();
+					return true;
+				}
+			}
+		</script>
+        <?php
+			$form = $this->form;
+			$form->setAttribute('class','security');
+			$form->setAttribute('action', $this->url('businessdate/eod'));
+			$form->setAttribute('style', 'width:500px; height:150px; left:45%;');
+			$form->prepare();
+			 
+			echo $this->form()->openTag($form);
+		?>
+			<h1><?php echo $this->escapeHtml($title); ?></h1>
+			<h4 class="error-msg"><?php echo $this->error; ?></h4>
+            <table style="width:100%;">
+            	<tr id='loading' style='height:100px; padding:0px; text-align:center; display:none;'>
+                    <td align='center' style='height:100px; padding:0px; text-align:center;'>
+                        <h4 style='font-weight:normal;margin-top:0px;'>Please, wait while End of Day (EOD) in process . . .</h4>
+                        <span>
+                            <img src='../../img/preloader2.gif' style='width:40px;' />
+                        </span>
+                    </td>
+                </tr>
+                <tr class="actions">
+                    <td align="center">
+                        <?php echo $this->formRow($form->get('btnEOD')); ?> &nbsp;
+                        <?php echo $this->formRow($form->get('btnBack')); ?> &nbsp;
+                        <?php echo $this->formRow($form->get('btnLogout')); ?>
+                    </td>
+                </tr>
+            </table>
+		<?php echo $this->form()->closeTag(); ?>
+	</div>
+</div>
