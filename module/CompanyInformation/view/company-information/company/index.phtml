@@ -1,0 +1,87 @@
+<?php if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+?>
+<p style="font-family:Tahoma, Geneva, sans-serif;">
+<?php /*?><a href="<?php echo $this->url('company', array('action'=>'add'));?>">Add Company</a><?php */?>
+</p>
+<?php
+	$companyTitle = 'Company Information';
+	$this->headTitle($companyTitle);
+?>
+<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php echo $this->escapeHtml($companyTitle); ?></h1>
+<table class="table" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+    <tr>
+        <th>Name</th>
+        <th>Code</th>
+        <th>Address</th>
+        <th>Phone</th>
+        <th>Fax</th>
+        <th>Email</th>
+        <th>Web</th>
+        <th>&nbsp;</th>
+    </tr>
+    
+    <?php 
+	$class = '';
+	foreach ($companys as $company) : 	
+	if($class == 'evenRow') {
+		$class = 'oddRow';
+	} else {
+		$class = 'evenRow';
+	}
+	?>
+    
+    <tr class="<?php echo $class; ?>">
+        <td><?php echo $this->escapeHtml($company->COMPANY_NAME);?></td>
+        <td><?php echo $this->escapeHtml($company->COMPANY_CODE);?></td>
+        <td><?php echo $this->escapeHtml($company->ADDRESS);?></td>
+        <td><?php echo $this->escapeHtml($company->PHONE);?></td>
+        <td><?php echo $this->escapeHtml($company->FAX);?></td>
+        <td><?php echo $this->escapeHtml($company->EMAIL);?></td>
+        <td><?php echo $this->escapeHtml($company->WEB);?></td>
+        <td>
+            <?php
+            	if(strtolower($company->ACTIVE_DEACTIVE) == 'y') {
+			?>
+            	<a href="<?php echo $this->url('company',array('action'=>'edit', 'id' => $company->COMPANY_ID));?>">Edit</a>
+            	<a href="#" onclick="getActiveDeactiveCompany(<?php echo $company->COMPANY_ID;?>,'n')">Deactive</a>
+            <?php		
+				} else {
+			?>
+            	<a href="#" onclick="getActiveDeactiveCompany(<?php echo $company->COMPANY_ID;?>,'y')">Active</a>
+            <?php		
+				}
+			?>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+
+<script type="application/javascript">
+	function getActiveDeactiveCompany(companyId,ststus) {
+		var alertData	= '';
+		
+		if(ststus== 'y') {
+			alertData = 'active';	
+		} else {
+			alertData = 'deactive';	
+		}
+		
+		if(!confirm('Are you sure, you want to ' +alertData+' ?')) {
+			return false;
+		} else {
+			var url = '/company/activeDeactiveCompany?companyId=' + companyId+ '&ststus=' + ststus;
+			$.getJSON(url, function(data) {
+			//$.post(url, function(data) {
+				if(data==true) {
+					window.location.href = "http://ibcia.pifmhq/company";
+				} else {
+					window.location.href = "http://ibcia.pifmhq/company";
+				}
+			});	
+		}
+	}
+</script>

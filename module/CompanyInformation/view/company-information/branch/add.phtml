@@ -1,0 +1,209 @@
+<?php
+	$title = 'Add Branch Information';
+	$this->headTitle($title);
+?>
+
+<script type="text/javascript">
+		/*
+		function addBranch() {
+			
+			var COMPANY_ID = $("#COMPANY_ID").val();
+			if(COMPANY_ID == ''){
+				//$("#COMPANY_ID").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var BRANCH_NAME = $("#BRANCH_NAME").val();
+			if(BRANCH_NAME == ''){
+				$("#COMPANY_ID").css({"border":"1px solid #ccc"});
+				//$("#BRANCH_NAME").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var BRANCH_CODE = $("#BRANCH_CODE").val();
+			if(BRANCH_CODE == ''){
+				$("#COMPANY_ID, #BRANCH_NAME").css({"border":"1px solid #ccc"});
+				//$("#BRANCH_CODE").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var ADDRESS = $("#ADDRESS").val();
+			if(ADDRESS == ''){
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE").css({"border":"1px solid #ccc"});
+				//$("#ADDRESS").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var PHONE = $("#PHONE").val();
+			if(PHONE == ''){
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE, #ADDRESS").css({"border":"1px solid #ccc"});
+				//$("#PHONE").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var FAX = $("#FAX").val();
+			if(FAX == ''){
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE, #ADDRESS").css({"border":"1px solid #ccc"});
+				//$("#FAX").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var EMAIL = $("#EMAIL").val();
+			if(EMAIL == ''){
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE, #ADDRESS, #PHONE").css({"border":"1px solid #ccc"});
+				//$("#EMAIL").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			var WEB = $("#WEB").val();
+			if(WEB == ''){
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE, #ADDRESS, #PHONE, #EMAIL").css({"border":"1px solid #ccc"});
+				//$("#WEB").css({"border":"1px solid red"}).focus();
+				return false;
+			}
+			if(!confirm('Are you sure, you want to proceed?')){
+				return false;
+			}
+			return true;
+		}
+		*/
+	</script>
+	
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('branch',array('action' => 'add')));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	echo $this->formRow($form->get('BRANCH_ID'));
+	echo $this->formRow($form->get('ACTIVE_DEACTIVE'));
+?>
+    <table width="50%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Company Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('COMPANY_ID')); ?>
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Branch Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('BRANCH_NAME')); ?>
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Branch Code</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('BRANCH_CODE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ADDRESS')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Phone Number</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('PHONE')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Fax Number</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('FAX')); ?>
+            </td>
+        </tr><tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Email Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMAIL')); ?>
+            </td>
+        </tr><tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Web Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('WEB')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                <!-- <input style="font-family:Tahoma, Geneva, sans-serif;font-size:100%;"  type="reset"  name="Reset" value="Reset" /> -->
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#COMPANY_ID").focus();
+	});
+	function addBranch() {
+		
+			if($("#COMPANY_ID").val() == '') {
+				$("#COMPANY_ID").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if($("#BRANCH_NAME").val() == '') {
+				$("#COMPANY_ID").css({"border":"1px solid green"});
+				$("#BRANCH_NAME").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if($("#BRANCH_CODE").val() == '') {
+				$("#COMPANY_ID, #BRANCH_NAME").css({"border":"1px solid green"});
+				$("#BRANCH_CODE").focus().css({"border":"1px solid red"});
+				return false;	
+			} else {
+				var BRANCH_CODE_LENGTH = $("input#BRANCH_CODE").val().length;
+				if (BRANCH_CODE_LENGTH < 3) {
+					alert('Please Enter 3 digit');
+					$("#BRANCH_CODE").focus().css({"border":"1px solid yellow"});
+					return false;
+				}	
+			}
+			if($("#ADDRESS").val() == '') {
+				$("#COMPANY_ID, #BRANCH_NAME, #BRANCH_CODE").css({"border":"1px solid green"});
+				$("#ADDRESS").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		}
+
+	$('form#branch input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					addBranch();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+</script>

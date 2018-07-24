@@ -1,0 +1,140 @@
+<?php
+	$title = 'Edit Company Information';
+	$this->headTitle($title);
+?>
+    
+<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url(
+			'company',
+			array(
+				'action'	=> 'edit',
+				'id'		=> $this->id,
+			)));
+	$form->prepare();
+	echo $this->form()->openTag($form);
+	
+	echo $this->formRow($form->get('COMPANY_ID'));
+	echo $this->formRow($form->get('ACTIVE_DEACTIVE'));
+?>
+    <table width="50%" class="frmTbl" style="font-family:Tahoma, Geneva, sans-serif; font-size:85%;">
+        <tr valign="top">
+            <td colspan="4" align="center"><h1><?php echo $this->escapeHtml($title);?></h1></td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Company Name</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('COMPANY_NAME')); ?>
+                <sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Company Code</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('COMPANY_CODE')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="top">
+            <td align="right">&nbsp;</td>
+            <td align="right">Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('ADDRESS')); ?>
+            	<sup style="color:red;">*</sup>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Phone Number</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('PHONE')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Fax Number</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('FAX')); ?>
+            </td>
+        </tr><tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Email Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('EMAIL')); ?>
+            </td>
+        </tr><tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">Web Address</td>
+            <td align="left">:</td>
+            <td align="left">
+            	<?php echo $this->formRow($form->get('WEB')); ?>
+            </td>
+        </tr>
+        <tr valign="middle">
+            <td align="right">&nbsp;</td>
+            <td align="right">&nbsp;</td>
+            <td align="left">&nbsp;</td>
+            <td align="left">
+				<?php echo $this->formSubmit($form->get('submit'));?>
+                <!--<input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type="reset"  name="Reset" value="Reset" /> -->
+            </td>
+        </tr>
+    </table>
+<?php
+	echo $this->form()->closeTag();
+?>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#COMPANY_NAME").focus();
+	});
+	
+	function addCompany(){
+			if($("#COMPANY_NAME").val() == '') {				
+				$("#COMPANY_NAME").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if($("#COMPANY_CODE").val() == '') {
+				$("#COMPANY_NAME").css({"border":"1px solid green"});
+				$("#COMPANY_CODE").focus().css({"border":"1px solid red"});
+				return false;	
+			} else {
+				var COMPANY_CODE_LENGTH = $("input#COMPANY_CODE").val().length;
+				if (COMPANY_CODE_LENGTH < 3) {					
+					$("#COMPANY_CODE").focus().css({"border":"1px solid yellow"});
+					return false;
+				}	
+			}
+			if($("#ADDRESS").val() == '') {
+				$("#COMPANY_CODE").css({"border":"1px solid green"});
+				$("#ADDRESS").focus().css({"border":"1px solid red"});
+				return false;
+			}
+			if(!confirm('Are you sure, you want to proceed?')) {
+				return false;
+			}
+			return true;
+		}
+
+		$('form#company input, select, textarea, button').keydown(function (e) {
+			if (e.keyCode == 13) {
+				var inputs = $(this).parents("form").eq(0).find(":input, select, textarea, button");
+				if (inputs[inputs.index(this) + 1] != null) {                    
+					inputs[inputs.index(this) + 1].focus();
+					
+				}else{
+					addCompany();
+				}
+				
+				e.preventDefault();
+				return false;
+			}
+		});
+        </script>
