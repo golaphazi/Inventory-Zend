@@ -1,0 +1,618 @@
+<?php
+	$title = 'Opening Balance Entry';
+	$this->headTitle($title);
+	?>
+	<h1 style="font-family:Tahoma, Geneva, sans-serif;"><?php 	
+	echo $this->escapeHtml($title);
+	if(count($flashMessages)) : 
+		foreach ($flashMessages as $msg) :
+			echo $msg;
+		endforeach;
+	   endif;
+	?></h1>
+	<?php
+	$form = $this->form;
+	$form->setAttribute('action',$this->url('openingbalanceentry'));
+	$form->prepare();	
+	echo $this->form()->openTag($form);
+	?>
+     <table width="100%" border="0" cellspacing="1" cellpadding="10" style="font-family:Tahoma, Geneva, sans-serif;margin:0px auto 0px auto; font-size:85%;">
+        <tr valign="top">
+            <td align="left">
+             <script type="text/javascript">
+					$(document).ready(function() {
+						$("#BRANCH_ID").focus();
+						$('#tranDateTo').datepicker({									
+							dateFormat : 'dd-mm-yy'
+						});
+					});
+					function doValidationPaymentEntry() {
+						var formObject = document.openingbalanceentry;
+						 if(formObject.BRANCH_ID.value=="") {
+							//alert("Please Select Branch!");
+							formObject.BRANCH_ID.focus();
+							return false;
+						}
+						if(formObject.tranDateTo.value=="") {
+							//alert("Please Enter Transection Record Date!");
+							formObject.tranDateTo.focus();
+							return false;
+						}
+						if(document.getElementById('coa_head'+1).value=="") {
+								//alert("Please Enter COA-Head!");
+								document.getElementById('coa_head'+1).focus();
+								return false;
+						}
+						if((document.getElementById('COATypeD'+1).checked==false) && (document.getElementById('COATypeC'+1).checked==false)){
+								//alert("Please Select Dr/Cr!");
+								document.getElementById('COATypeD'+1).focus();
+								return false;
+							
+						}
+						if(document.getElementById('amount'+1).value=="0.00") {
+								//alert("Please Enter Amount!");
+								document.getElementById('amount'+1).focus();
+								return false;
+						}
+						var numOfRows = $("#NumberOfRows").val();
+						for(var i = 2; i < numOfRows; i++ ) {
+							if(document.getElementById('coa_head'+i).value !="") {
+								if((document.getElementById('COATypeD'+i).checked==false) && (document.getElementById('COATypeC'+i).checked==false)){
+									//alert("Please Select Dr/Cr!");
+									document.getElementById('COATypeD'+i).focus();
+									return false;
+								}if(document.getElementById('amount'+i).value=="0.00") {
+									//alert("Please Enter Amount!");
+									document.getElementById('amount'+i).focus();
+									return false;
+								}
+							}
+						
+						}
+																													
+						var k=0;
+						var i=0;
+						var Totaldebit = 0;
+						var TotalCredit = 0;
+						for(i = 1; i < numOfRows; i++){
+							if((document.getElementById('COATypeD'+i).checked==true) || (document.getElementById('COATypeC'+i).checked==true)){
+								if((document.getElementById('COATypeD'+i).checked==true) && (document.getElementById('amount'+i).value !="")){
+									var debitAmount = document.getElementById('amount'+i).value;
+									debitAmount     = debitAmount.replace(/\,/g,"");
+									debitAmount     = Number(debitAmount);
+									Totaldebit      = Totaldebit + debitAmount;
+								}
+								if((document.getElementById('COATypeC'+i).checked==true) && (document.getElementById('amount'+i).value !="")){
+									var creditAmount 	= document.getElementById('amount'+i).value;
+									creditAmount 	    = creditAmount.replace(/\,/g,"");
+									creditAmount 	    = Number(creditAmount);
+									TotalCredit 		= TotalCredit + creditAmount;
+								}
+																		
+							}		
+						
+						}
+						Totaldebit = Totaldebit.toFixed(2);
+						TotalCredit = TotalCredit.toFixed(2);
+						////alert(Totaldebit);
+						////alert(TotalCredit);
+						if(Number(Totaldebit) != Number(TotalCredit)) {
+							if(Totaldebit > TotalCredit) {
+								var diffAmount = Totaldebit - TotalCredit;	
+							} else {
+								var diffAmount = TotalCredit - Totaldebit;
+							}
+							
+							//alert("Debit and Credit Amount mismatch! Difference : " + numberFormat('',diffAmount,2,',','.'));
+							document.getElementById('amount'+2).focus();
+							return false;
+						}
+						if(!confirm('Are you sure, you want to proceed?')){
+								return false;
+						}    
+						return true;
+					}
+					function cashDividendAIField(){
+						
+						if(document.getElementById('cashDividendChk').checked==true){
+							document.getElementById('cashDividend').disabled=false;
+							
+						}
+						if(document.getElementById('cashDividendChk').checked==false){
+							document.getElementById('cashDividend').disabled=true;
+							
+						}	
+					}
+					function BasedOnCBShow(v){
+						//$.getJSON("ajax/getCBCOACode.php",{'cbCode':v}, function(j){
+						$.getJSON('/openingbalanceentry/getCBCOACode',{'cbCode':v},function(j){
+								////alert(j);
+								if(j.length>0)
+								{
+									var options = '';
+									options += '<option value="">Select COA-Code</option>';
+									for (var i = 0; i < j.length; i++) {
+									options += '<option value="' + j[i].optionValue + '">' + j[i].optionDisplay + '</option>';
+									}
+									$("select#cbCOACode").html('');
+									$("select#cbCOACode").html(options);
+								}
+								else
+								{
+									options = '<option value="">Select COA-Code</option>';
+									$("select#cbCOACode").html('');
+									$("select#cbCOACode").html(options);
+								}
+							});
+						
+						if( v == 'cash'){
+							document.getElementById('showChqNo').style.display='none';
+							document.getElementById('showChqDate').style.display='none';
+							
+						}
+						if( v == 'bank'){
+							document.getElementById('showChqNo').style.display='';
+							document.getElementById('showChqDate').style.display='';
+							
+						}	
+					}
+					/*
+					function coa_code_suggest(inputString,no) 
+					{
+						////alert(inputString);
+						////alert(no);
+						if(inputString.length == 0)
+						{
+							$('#empIdSuggestions'+no).fadeOut();
+						} 
+						else 
+						{
+							//$.post("ajax/suggest_ref_coa_code.php", {queryString: inputString, no : no}, 
+							$.post('/openingbalanceentry/getSuggestRefCOAName',{queryString: inputString, no : no},
+							function(data)
+							{
+								////alert(data);
+								if(data.length >0) 
+								{
+									$('#suggestingEmpIdList'+no).html(data);
+									$('#empIdSuggestions'+no).fadeIn("slow");
+									
+								}
+							});
+						}
+					}
+					function fill_id(thisValue,no) {
+					   var coaCodeHeadName = thisValue;
+					   if(coaCodeHeadName == '') {
+							document.getElementById('coa_code'+no).value = '';
+							document.getElementById('coa_head'+no).value = '';
+							return false;
+						}
+						var myArray = coaCodeHeadName.split(','); 
+						document.getElementById('coa_codeshow'+no).innerHTML = myArray[0];
+						document.getElementById('coa_code'+no).value = myArray[0];
+						document.getElementById('coa_head'+no).value = myArray[1];
+																
+					   $('#empIdSuggestions'+no).fadeOut();
+					   
+					    //$.post("ajax/JournalDrCrSelect.php", {coaCode: myArray[0]}, 
+					    $.post('/openingbalanceentry/getJournalDrCrSelect',{coaCode: myArray[0]},	
+						//$.getJSON('/openingbalanceentry/getJournalDrCrSelect',{coaCode: myArray[0]},
+						function(data) {
+							if(data.toLowerCase() == 'dr') {
+								document.getElementById('COATypeD'+no).checked = true;
+								//document.getElementById('COATypeC'+no).disabled = true;
+								DrCrAmountAlign(no);
+							} else if(data.toLowerCase() == 'cr') {
+								//document.getElementById('COATypeD'+no).disabled = true;
+								document.getElementById('COATypeC'+no).checked = true;
+								DrCrAmountAlign(no);
+								
+							} else {
+								document.getElementById('COATypeD'+no).checked = false;
+								document.getElementById('COATypeC'+no).checked = false;
+								//document.getElementById('COATypeD'+no).disabled = false;
+								//document.getElementById('COATypeC'+no).disabled = false;
+								DrCrAmountAlign(no);
+							}
+						});
+					   
+					}
+					*/
+					function DrCrAmountAlign(e) {
+							
+						if(document.getElementById('COATypeD'+e).checked==true){	
+							document.getElementById('amount'+e).style.textAlign = 'left'
+							
+						}
+						
+						if(document.getElementById('COATypeC'+e).checked==true){
+							document.getElementById('amount'+e).style.textAlign = 'right'
+						}
+						return true;
+					}
+					function blankAllFields() {
+						for(var i = 1; i<= 10; i++) {
+							document.getElementById('coa_head'+i).value = '';
+							document.getElementById('coa_codeshow'+i).innerHTML = '';
+							document.getElementById('coa_code'+i).value = '';
+							document.getElementById('COATypeD'+i).disabled = false;
+							document.getElementById('COATypeC'+i).disabled = false;
+							document.getElementById('COATypeD'+i).checked = false;
+							document.getElementById('COATypeC'+i).checked = false;
+							document.getElementById('amount'+i).value = '0.00';
+							document.getElementById('amount'+i).style.textAlign = 'right';
+								
+						}
+						document.getElementById('particulars').value = '';
+						
+					}
+					
+					function AddTabRow() {
+						var numOfRows = $("#NumberOfRows").val();
+						var numOfRowsId = numOfRows - 1;
+																
+						if(document.getElementById('amount'+numOfRowsId).value=="0.00") {
+								return false;
+						} else {
+							// clone the last row in the table
+							var $tr = $("#ClosingBalTab").find("tbody tr:last").clone();
+							$tr.find("#coa_head"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onKeyup", function(){
+								return "coa_code_suggest(this.value,"+numOfRows+"); removeNumber(this);";
+							}).attr("value", function(){
+								return "";
+							});
+							
+							$tr.find("#empIdSuggestions"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							$tr.find("#suggestingEmpIdList"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							$tr.find("#coa_codeshow"+numOfRowsId).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							$tr.find("#coa_code"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							});
+							
+							
+							$tr.find("#COATypeD"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onClick", function(){
+								return "DrCrAmountAlign("+numOfRows+"); totalDRCRShow();";
+							}).attr("checked", function(){
+								return false;
+							});
+							
+							$tr.find("#COATypeC"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onClick", function(){
+								return "DrCrAmountAlign("+numOfRows+"); totalDRCRShow();";
+							}).attr("checked", function(){
+								return false;
+							});
+							
+							$tr.find("#amount"+numOfRowsId).attr("name", function()
+							{
+								// break the field name and it's number into two parts
+								var parts = this.name.match(/(\D+)(\d+)$/);
+								// create a unique name for the new field by incrementing
+								// the number for the previous field by 1
+								return parts[1] + ++parts[2];
+							// repeat for id attributes
+							}).attr("id", function(){
+								var parts = this.id.match(/(\D+)(\d+)$/);
+								return parts[1] + ++parts[2];
+							}).attr("onBlur", function(){
+								return "numberFormat(\"amount"+numOfRows+"\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; AddTabRow(); totalDRCRShow();";
+							}).attr("value", function(){
+								return "0.00";
+							});
+							
+							$("#ClosingBalTab").find("tbody tr:last").after($tr);
+							$("#coa_codeshow"+numOfRows).html('');
+							$("#NumberOfRows").attr("value",Number(numOfRows)+1);
+						}
+					}
+					
+					function totalDRCRShow() {
+						var numOfRows = $("#NumberOfRows").val();
+						var k=0;
+						var i=0;
+						var Totaldebit = 0;
+						var TotalCredit = 0;
+						for(i = 1; i < numOfRows; i++){
+							if((document.getElementById('COATypeD'+i).checked==true) || (document.getElementById('COATypeC'+i).checked==true)) {
+							  if((document.getElementById('COATypeD'+i).checked==true) && (document.getElementById('amount'+i).value !="")){
+								  var debitAmount = document.getElementById('amount'+i).value;
+								  debitAmount     = debitAmount.replace(/\,/g,"");
+								  debitAmount     = Number(debitAmount);
+								  Totaldebit      = Totaldebit + debitAmount;
+							  }if((document.getElementById('COATypeC'+i).checked==true) && (document.getElementById('amount'+i).value !="")){
+								  var creditAmount 	= document.getElementById('amount'+i).value;
+								  creditAmount 	    = creditAmount.replace(/\,/g,"");
+								  creditAmount 	    = Number(creditAmount);
+								  TotalCredit 		= TotalCredit + creditAmount;
+							  }										
+							}
+						}
+						$("#DRTOTAL").html(numberFormat('',Totaldebit,2,',','.'));
+						$("#CRTOTAL").html(numberFormat('',TotalCredit,2,',','.'));
+					}
+					function checkCalender(thisDate,businessDate){
+						var fromDate = thisDate;
+						var toDate = businessDate;
+						if((fromDate != '') && (toDate != '')){							
+							var tempFromDate = fromDate.split('-');
+							var tempToDate = toDate.split('-');					
+							var a = tempFromDate[1]+'/'+tempFromDate[0]+'/'+tempFromDate[2];
+							var b = tempToDate[1]+'/'+tempToDate[0]+'/'+tempToDate[2];													
+							if((dates.compare(b,a) == 1) || (dates.compare(b,a) == 0)) {
+								return true;
+							} else {
+								//alert('Invalid Date Range!');
+								$("#TRANSACTION_DATE2").attr("value",businessDate);
+								//$("#tranDateTo").attr("value",businessDate);
+								return false;
+							}
+						}
+					}
+					function pageReset() {
+						$('#viewBalanceSheet').fadeOut("slow");
+						$('#preloader').fadeIn("slow");
+						//$('#viewPTBStatement').fadeOut("slow");
+						$('#noDataFound').fadeIn('slow');
+					}
+					function fill_id(thisValue,no) {
+
+					   var coaCodeHeadName = thisValue;
+					   //var myArray = coaCodeHeadName.split(',');
+					   //alert(myArray[0]);
+					   if(coaCodeHeadName == '') {
+							document.getElementById('coa_codeshow'+no).innerHTML = '';
+							document.getElementById('coa_code'+no).value = '';
+							$("#coa_head"+no).focus();
+							return false;
+						}else{
+						   var myArray = coaCodeHeadName.split(','); 
+							document.getElementById('coa_codeshow'+no).innerHTML = myArray[0];
+							document.getElementById('coa_code'+no).value = myArray[0];
+							$("#amount"+no).focus();
+							return false;	
+						}						
+					}
+					$(document).ready(function(){
+						var no = 11;
+						//$('#CATEGORYL'+no).html('');
+						var inputString = '';
+						
+						$.post('/paymententry/getAccountsHead',{queryString: inputString, no : no},
+						function(data)
+						{
+							for(var i=0; i < no; i++){
+								$('#CATEGORYL'+i).html(data);
+							}
+							
+
+						});
+					});	
+
+					function selectOption(event,id){
+						 var x = event.which || event.keyCode;
+						 if(x == '39'){
+							 var textstring = $("#coa_head"+id).val();
+						//alert(textstring);
+							$.post('/paymententry/getAccountsHead',{queryString: textstring, no : id},
+							 function(dataa){
+								// alert(dataa);
+								 if(dataa.length > 0){
+									 var myArray = $.trim(dataa); 
+									 
+									 fill_id(myArray,id);
+									// var idf = id+1;
+									 //if(idf >= 0 || idf <= 10){
+										// $("#PAYMENT_AMOUNT"+id).focus();
+									// }
+									 
+								 }else{
+									 $("#coa_head"+id).focus();
+									 $("#coa_codeshow"+id).html('');
+									 $("#coa_code"+id).val('');
+								 }
+							 })
+						 }else if(x == '37'){
+							  var idf = id-1;
+							  if(idf > 0 || idf <= 10){
+									$("#coa_head"+idf).focus();
+									$("#coa_code"+idf).val('');
+									 $("#coa_codeshow"+id).html('');
+							  }
+							  if(idf == 0){
+								  $("#PAYMENT_TO").val('');
+								  $("#PAYMENT_TO").focus();		
+							  }
+							 
+						 }
+					}
+					
+					function next(event,id,field){
+						 var x = event.which || event.keyCode;
+						 if(x == '39'){
+							 if(field == 1){
+								var idf = id+1;
+								$("#coa_head"+idf).focus(); 
+							 }else if(field == 2){
+								
+								if(back < 11){
+									  $("#amount"+id).focus();
+								 }								 
+							 }
+							 
+						 }else if(x == '37'){
+							 if(field == 1){
+								$("#coa_head"+id).focus(); 
+							 }else if(field == 2){
+								 var back = id-1;
+								 if(back > 0){
+									 $("#amount"+back).focus(); 
+								 }
+								 
+							 }
+						 }
+						
+					}
+                </script>
+               <fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;font-family:Tahoma, Geneva, sans-serif;'>
+					<legend style='border:0px;'>Search By</legend>
+                            <table border="0" cellpadding="2" cellspacing="2" width="100%" style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;">
+                                <tr>
+                                    <td width="15%">&nbsp;</td>
+                                    <td width="25%">
+                                    Branch </td>
+                                    <td width="1%">: </td>
+                                    <td colspan="2">
+                                        <?php echo $this->formRow($form->get('BRANCH_ID')); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                     Transaction Date </td>
+                                    <td> : </td>
+                                    <td colspan="2">
+                                     <?php echo $this->formRow($form->get('tranDateTo')); ?>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>
+                                        <input type="hidden"  name="paymentEntry" id="paymentEntry" value="J"/>
+                                       <!-- <input type='button' name='goBtn' id='goBtn' value='GO' class="FormBtn"/>-->
+                                        <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type='reset' name='Reset' id='Reset' value='Reset' class="FormBtn"/>
+                                     </td>
+                                 </tr>
+                                 <tr>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                     <td>&nbsp;</td>
+                                 </tr>
+                            </table>
+                </fieldset>
+            </td>
+        </tr>
+        <tr valign="top" >
+            <td align="center">
+            	<fieldset style='width:100%;border:0px;border-top:1px solid #2b2d93;'>
+				<legend style='border:0px;cursor:pointer;' onClick="return ShowHide('viewcomp_minorest')">COA Record</legend>
+                       <table id="ClosingBalTab" border="0" width="90%" align="center" cellspacing="1" cellpadding="3" style="font-size:95%;font-family:Tahoma, Geneva, sans-serif;">
+                           <?php 
+						   	$tableTR = '';
+							$tableTR .='<tr valign="top" style="font-weight:bold;">
+											<td width="21%" align="right" class="" colspan="5">';
+							$tableTR .= '<a href="#" onclick="Popup=window.open(\'newAccounting.php\',\'Popup\',\'width=620,height=300,left=280,top=80,toolbar=no\')">
+				Add New COA</a></td></tr>';	
+							$tableTR .='<tr valign="top" style="font-weight:bold; text-align:center; background:#E8E1E1;">
+											<td width="55%" align="left" class="">ACCOUNT HEAD</td>
+											<td width="15%" align="center" class="">ACCOUNT CODE</td>
+											<td width="15%" align="center" class="">DR/CR</td>
+											<td width="15%" align="right" class="">AMOUNT</td>
+										</tr>';
+										
+							for($i=1; $i<=10; $i++){
+							$tableTR .="<tr valign='top' >
+											<td  align='left' class=''>
+												 <div style='position:relative;'>
+													<input name='coa_head{$i}' type='text'  id='coa_head{$i}' list='CATEGORYL{$i}'  onkeypress='selectOption(event,{$i})' onkeypress='next(event,{$i},2)' style='width:320px;font-family:Tahoma, Geneva, sans-serif;' value='' autocomplete='off' onkeyup='coa_code_suggest(this.value,{$i}); removeNumber(this);' onclick='if($(\"#BRANCH_ID\").val()==\"\"){ //alert(\"Please select Branch!\");  $(\"#BRANCH_ID\").focus();}'/>
+													<div id='empIdSuggestions{$i}' style='display:none;' class='ClassempIdSuggestions'>
+														<div id='suggestingEmpIdList{$i}' class='ClasssuggestingEmpIdList'>
+														</div>
+													</div>
+													<datalist id='CATEGORYL{$i}'>
+									
+													</datalist>
+												</div>
+											</td>
+											<td  align='center' class=''><div id='coa_codeshow{$i}'></div><input type='hidden' readonly='readonly' style='background-color:#999' name='coa_code{$i}' id='coa_code{$i}' size='20'/></td>
+											<td  align='center' class=''><input type='radio' onclick='DrCrAmountAlign($i); totalDRCRShow();' name='COAType{$i}' id='COATypeD{$i}' value='D'  />  Dr <input type='radio' onclick='DrCrAmountAlign($i); totalDRCRShow();' name='COAType{$i}' id='COATypeC{$i}' value='C'  />  Cr</td>
+											<td  align='right' class=''><input type='text' name='amount{$i}' id='amount{$i}' onkeyup='removeChar(this);' size='20' onkeypress='next(event,{$i},1)'  class='FormNumericTypeInput' onfocus='if(this.value==\"0.00\") this.value=\"\";' onblur='numberFormat(\"amount{$i}\",this.value,2,\",\",\".\"); if((this.value==\"\") || (this.value==0)) this.value=\"0.00\"; AddTabRow(); totalDRCRShow();' value=\"0.00\"/></td>
+										</tr>";		
+							}
+							echo $tableTR;
+						   ?>
+                       </table>
+                       <table border="0" width="90%" align="center" cellspacing="1" cellpadding="3" style="font-size:95%;font-family:Tahoma, Geneva, sans-serif;">
+                            <tr valign='top' style="font-weight:bold;">
+                                <td width="6%"  align='left' class=''>&nbsp; </td>
+                                <td width="8%"  align='center' class=''>&nbsp;</td>
+                                <td width="70%"  align='right' class=''>Total Debit : </td>
+                                <td width="16%"  align='left' class=''><span id="DRTOTAL">0.00</span></td>
+                            </tr>
+                             <tr valign='top' style="font-weight:bold;" >
+                                <td  align='left' class=''>&nbsp; </td>
+                                <td  align='center' class=''>&nbsp;</td>
+                                <td  align='right' class=''>Total Credit : </td>
+                                <td  align='right' class=''><span id="CRTOTAL">0.00</span></td>
+                            </tr>
+                            <tr valign="top">
+                                 <td align="center" colspan="5">
+                                 <input type="hidden" name="NumberOfRows" id="NumberOfRows" value="<?php echo $i; ?>"/>
+                                 <input style="font-family:Tahoma, Geneva, sans-serif; font-size:100%;" type="submit" name="insertJournal" id="insertJournal" value="Submit" />
+                                 </td>
+                             </tr>
+                       </table>
+                </fieldset>
+            </td>
+  		</tr>
+    </table>
+	<?php 
+	//echo $this->formCollection($form);
+	echo $this->form()->closeTag();
+	?>
